@@ -51,11 +51,11 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
   };
 
   const sidebarContent = (
-    <div className="flex h-full flex-col bg-[#0F2823] text-white">
+    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       {/* Logo Area */}
       <div
         className={cn(
-          "flex h-16 items-center border-b border-[#1a3b34] px-4 shrink-0",
+          "flex h-16 items-center border-b border-sidebar-border px-4 shrink-0",
           collapsed ? "justify-center" : "justify-between"
         )}
       >
@@ -64,7 +64,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
             <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shrink-0">
               <span className="font-bold text-white">V</span>
             </div>
-            <span className="text-xl font-bold tracking-tight">Salluz</span>
+            <span className="text-xl font-bold tracking-tight">ZendaTracker</span>
           </Link>
         )}
         {collapsed && (
@@ -153,7 +153,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
       </ScrollArea>
 
       {/* Footer / User Profile */}
-      <div className="p-4 border-t border-[#1a3b34]">
+      <div className="p-4 border-t border-sidebar-border">
         <div
           onClick={() => logout()}
           className={cn(
@@ -186,7 +186,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col h-full shrink-0 transition-all duration-300 ease-in-out border-r border-[#1a3b34] bg-[#0F2823]",
+          "hidden lg:flex flex-col h-full shrink-0 transition-all duration-300 ease-in-out border-r border-sidebar-border bg-sidebar",
           collapsed ? "w-16" : "w-64"
         )}
       >
@@ -201,7 +201,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col lg:hidden transition-transform duration-300 ease-in-out bg-[#0F2823]",
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col lg:hidden transition-transform duration-300 ease-in-out bg-sidebar",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >

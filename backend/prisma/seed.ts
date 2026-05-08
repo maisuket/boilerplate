@@ -6,8 +6,8 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting database seed...');
 
-  const adminPassword = await bcrypt.hash('Admin@123456', 12);
-  const userPassword = await bcrypt.hash('User@123456', 12);
+  const adminPassword = await bcrypt.hash('123456', 12);
+  const userPassword = await bcrypt.hash('123456', 12);
 
   // Seed admin user
   const admin = await prisma.user.upsert({
@@ -67,8 +67,8 @@ async function main() {
   console.log('Audit logs created.');
   console.log('Seed completed successfully!');
   console.log('\nCredentials:');
-  console.log('  Admin - email: admin@example.com, password: Admin@123456');
-  console.log('  User  - email: user@example.com,  password: User@123456');
+  console.log('  Admin - email: admin@example.com, password: 123456');
+  console.log('  User  - email: user@example.com,  password: 123456');
 }
 
 main()
