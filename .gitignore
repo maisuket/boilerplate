@@ -4,18 +4,17 @@ node_modules/
 .pnp.js
 
 # Environment
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.production
+.env*
+!.env.example
+!.env.template
 
 # Build outputs
 dist/
 build/
 .next/
 out/
+.turbo/
+.vercel/
 
 # Logs
 logs/
@@ -55,6 +54,8 @@ Thumbs.db
 # Prisma
 prisma/migrations/dev.db
 *.db
+*.sqlite
+*.sqlite3
 
 # TypeScript
 *.tsbuildinfo
@@ -63,5 +64,9 @@ prisma/migrations/dev.db
 test-results/
 playwright-report/
 
-# Docker
-.dockerignore
+# Security / Certificates
+*.pem
+*.key
+*.cert
+*.crt
+secrets/

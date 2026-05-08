@@ -47,10 +47,7 @@ import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
           transports: [
             new winston.transports.Console({
               format: isProduction
-                ? winston.format.combine(
-                    winston.format.timestamp(),
-                    winston.format.json(),
-                  )
+                ? winston.format.combine(winston.format.timestamp(), winston.format.json())
                 : winston.format.combine(
                     winston.format.colorize(),
                     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
