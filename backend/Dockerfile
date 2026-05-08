@@ -1,11 +1,11 @@
 # Stage 1: Dependencies
-FROM node:20-alpine AS deps
+FROM node:20-alpine AS development
 WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm ci --only=production && \
+RUN npm install --omit=dev && \
     npm install --save-dev prisma && \
     npx prisma generate
 
@@ -17,7 +17,7 @@ COPY package*.json ./
 COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
-RUN npm ci
+RUN npm install
 
 COPY prisma ./prisma/
 RUN npx prisma generate

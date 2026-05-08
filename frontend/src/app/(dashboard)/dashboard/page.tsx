@@ -144,9 +144,7 @@ export default function DashboardPage() {
             title="Sales by Category"
             description="Top performing product categories"
             data={categoryData}
-            bars={[
-              { dataKey: "sales", name: "Sales", color: "#3b82f6" },
-            ]}
+            bars={[{ dataKey: "sales", name: "Sales", color: "#3b82f6" }]}
             xAxisKey="category"
           />
         </div>

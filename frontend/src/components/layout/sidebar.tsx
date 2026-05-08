@@ -15,11 +15,11 @@ import {
 
 import { NavItem } from "./nav-item";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { cn } from "@/lib/utils";
 import { APP_NAME } from "@/constants/app";
 import { ROUTES } from "@/constants/routes";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -59,12 +59,7 @@ const bottomNavItems = [
   },
 ];
 
-export function Sidebar({
-  collapsed,
-  mobileOpen,
-  onMobileClose,
-  onToggleCollapse,
-}: SidebarProps) {
+export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname();
 
   const sidebarContent = (
@@ -96,11 +91,7 @@ export function Sidebar({
           onClick={onToggleCollapse}
           className="hidden lg:flex h-8 w-8 shrink-0 text-[hsl(var(--sidebar-foreground))] hover:bg-[hsl(var(--sidebar-accent))] hover:text-[hsl(var(--sidebar-accent-foreground))]"
         >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
       </div>
 
@@ -150,10 +141,7 @@ export function Sidebar({
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-          onClick={onMobileClose}
-        />
+        <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={onMobileClose} />
       )}
 
       {/* Mobile sidebar */}
@@ -175,9 +163,4 @@ export function Sidebar({
       </aside>
     </>
   );
-}
-
-// Re-export ScrollArea stub to avoid import errors if not installed
-function ScrollArea({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={cn("overflow-y-auto", className)}>{children}</div>;
 }

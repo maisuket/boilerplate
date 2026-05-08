@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Search, Filter } from "lucide-react";
 
@@ -48,12 +48,16 @@ export default function UsersPage() {
     placeholderData: (prev) => prev,
   });
 
-  const users = data?.data ?? [];
-  const total = data?.meta?.total ?? 0;
+  // Extrai a resposta paginada lidando tanto com o formato do Axios quanto direto da API
+  const responseData = (data as any)?.data || data;
+  const users = Array.isArray(responseData?.data) ? responseData.data : [];
+  const total = responseData?.meta?.total ?? 0;
 
-  if (total !== 0) {
-    setTotal(total);
-  }
+  useEffect(() => {
+    if (total !== 0) {
+      setTotal(total);
+    }
+  }, [total, setTotal]);
 
   const getInitials = (name: string) => {
     return name
@@ -69,9 +73,7 @@ export default function UsersPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Users</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your application users
-          </p>
+          <p className="text-muted-foreground mt-1">Manage your application users</p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -84,9 +86,7 @@ export default function UsersPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>All Users</CardTitle>
-              <CardDescription>
-                {isLoading ? "Loading..." : `${total} total users`}
-              </CardDescription>
+              <CardDescription>{isLoading ? "Loading..." : `${total} total users`}</CardDescription>
             </div>
             <div className="flex gap-2">
               <div className="relative">
@@ -131,10 +131,18 @@ export default function UsersPage() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-16 ml-auto" /></TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-16" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-16" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-8 w-16 ml-auto" />
+                    </TableCell>
                   </TableRow>
                 ))
               ) : isError ? (
@@ -171,9 +179,7 @@ export default function UsersPage() {
                         </Avatar>
                         <div>
                           <p className="font-medium leading-none">{user.name}</p>
-                          <p className="text-sm text-muted-foreground mt-0.5">
-                            {user.email}
-                          </p>
+                          <p className="text-sm text-muted-foreground mt-0.5">{user.email}</p>
                         </div>
                       </div>
                     </TableCell>
@@ -184,11 +190,7 @@ export default function UsersPage() {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant={
-                          user.isActive
-                            ? "default"
-                            : "destructive"
-                        }
+                        variant={user.isActive ? "default" : "destructive"}
                         className={
                           user.isActive
                             ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 border-0"
