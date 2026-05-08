@@ -1,5 +1,5 @@
 import { NestFactory, Reflector } from '@nestjs/core';
-import { ValidationPipe, ClassSerializerInterceptor, Logger } from '@nestjs/common';
+import { ValidationPipe, ClassSerializerInterceptor, Logger, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -24,6 +24,12 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api');
 
+  // Habilita o versionamento de rotas (ex: /api/v1/...)
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
+
   // Security headers
   app.use(helmet.default());
 
@@ -32,9 +38,10 @@ async function bootstrap() {
 
   // CORS configuration
   app.enableCors({
-    origin: nodeEnv === 'production'
-      ? [appUrl as string]
-      : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'],
+    origin:
+      nodeEnv === 'production'
+        ? [appUrl as string]
+        : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true,
