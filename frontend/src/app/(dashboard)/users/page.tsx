@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Plus, Search, Filter } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Plus, Search, Filter, MoreHorizontal, Edit2, Trash2, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -16,11 +17,38 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { usePagination } from "@/hooks/use-pagination";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useToast } from "@/hooks/use-toast";
 import { QUERY_KEYS } from "@/constants/query-keys";
 import { usersService } from "@/services/users.service";
 import { formatDate } from "@/utils/format";
@@ -30,7 +58,10 @@ const ITEMS_PER_PAGE = 10;
 
 export default function UsersPage() {
   const [search, setSearch] = useState("");
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const debouncedSearch = useDebounce(search, 400);
+  const toast = useToast();
 
   const { page, setPage, totalPages, setTotal } = usePagination({
     initialPage: 1,
@@ -48,10 +79,35 @@ export default function UsersPage() {
     placeholderData: (prev) => prev,
   });
 
-  // Extrai a resposta paginada lidando tanto com o formato do Axios quanto direto da API
-  const responseData = (data as any)?.data || data;
-  const users = Array.isArray(responseData?.data) ? responseData.data : [];
-  const total = responseData?.meta?.total ?? 0;
+  const deleteMutation = useMutation({
+    mutationFn: usersService.deleteUser,
+    onSuccess: () => {
+      toast.success("User deleted", "The user has been successfully removed.");
+      refetch(); // Recarrega a tabela após deletar
+    },
+    onError: () => {
+      toast.error("Error", "Failed to delete the user. Please try again.");
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: usersService.createUser,
+    onSuccess: () => {
+      toast.success("User created", "The user has been successfully created.");
+      setIsAddUserOpen(false);
+      refetch(); // Recarrega a tabela após criar
+    },
+    onError: (error: any) => {
+      toast.error(
+        "Error",
+        error.response?.data?.message || "Failed to create user. Please try again."
+      );
+    },
+  });
+
+  // Usa diretamente a resposta tipada retornada pelo React Query / Axios
+  const users = Array.isArray(data?.data) ? data.data : [];
+  const total = data?.meta?.total ?? 0;
 
   useEffect(() => {
     if (total !== 0) {
@@ -68,6 +124,24 @@ export default function UsersPage() {
       .slice(0, 2);
   };
 
+  const confirmDelete = () => {
+    if (userToDelete) {
+      deleteMutation.mutate(userToDelete);
+      setUserToDelete(null);
+    }
+  };
+
+  const handleAddUser = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const role = formData.get("role") as "admin" | "user" | "moderator";
+
+    createMutation.mutate({ name, email, password, role, isActive: true });
+  };
+
   return (
     <div className="space-y-6 animate-in">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -75,10 +149,91 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold tracking-tight">Users</h1>
           <p className="text-muted-foreground mt-1">Manage your application users</p>
         </div>
-        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
-          <Plus className="mr-2 h-4 w-4" />
-          Add User
-        </Button>
+        <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
+              <Plus className="mr-2 h-4 w-4" />
+              Add User
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <form onSubmit={handleAddUser}>
+              <DialogHeader>
+                <DialogTitle>Add New User</DialogTitle>
+                <DialogDescription>
+                  Create a new user account. They will be able to log in immediately.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    required
+                    placeholder="John Doe"
+                    disabled={createMutation.isPending}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="john@example.com"
+                    disabled={createMutation.isPending}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    disabled={createMutation.isPending}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="role">Role</Label>
+                  <select
+                    id="role"
+                    name="role"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    required
+                    disabled={createMutation.isPending}
+                    defaultValue="user"
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                    <option value="moderator">Moderator</option>
+                  </select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAddUserOpen(false)}
+                  disabled={createMutation.isPending}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                >
+                  {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {createMutation.isPending ? "Creating..." : "Create User"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Card>
@@ -204,13 +359,28 @@ export default function UsersPage() {
                       {formatDate(user.createdAt)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400 dark:hover:text-emerald-300 dark:hover:bg-emerald-500/20"
-                      >
-                        Edit
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem className="cursor-pointer">
+                            <Edit2 className="mr-2 h-4 w-4" />
+                            <span>Edit</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+                            onClick={() => setUserToDelete(user.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            <span>Delete</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))
@@ -245,6 +415,27 @@ export default function UsersPage() {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the user and remove their
+              data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, Bell, Sun, Moon, Monitor, LogOut, User, Settings, ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -16,12 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
 import { ROUTES } from "@/constants/routes";
 
@@ -41,6 +36,11 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [notificationCount] = useState(3);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const getInitials = (name?: string) => {
     if (!name) return "U";
@@ -60,12 +60,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b bg-background px-4 sm:px-6">
       <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onMobileMenuToggle}
-          className="lg:hidden"
-        >
+        <Button variant="ghost" size="icon" onClick={onMobileMenuToggle} className="lg:hidden">
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle menu</span>
         </Button>
@@ -79,12 +74,16 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-9 w-9">
-                    {theme === "light" ? (
-                      <Sun className="h-4 w-4" />
-                    ) : theme === "dark" ? (
-                      <Moon className="h-4 w-4" />
+                    {mounted ? (
+                      theme === "light" ? (
+                        <Sun className="h-4 w-4" />
+                      ) : theme === "dark" ? (
+                        <Moon className="h-4 w-4" />
+                      ) : (
+                        <Monitor className="h-4 w-4" />
+                      )
                     ) : (
-                      <Monitor className="h-4 w-4" />
+                      <span className="h-4 w-4" />
                     )}
                     <span className="sr-only">Toggle theme</span>
                   </Button>
@@ -95,16 +94,10 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
           </TooltipProvider>
           <DropdownMenuContent align="end">
             {themeOptions.map(({ value, label, icon: Icon }) => (
-              <DropdownMenuItem
-                key={value}
-                onClick={() => setTheme(value)}
-                className="gap-2"
-              >
+              <DropdownMenuItem key={value} onClick={() => setTheme(value)} className="gap-2">
                 <Icon className="h-4 w-4" />
                 {label}
-                {theme === value && (
-                  <span className="ml-auto text-xs text-primary">✓</span>
-                )}
+                {theme === value && <span className="ml-auto text-xs text-primary">✓</span>}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -117,9 +110,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
               <Button variant="ghost" size="icon" className="relative h-9 w-9">
                 <Bell className="h-4 w-4" />
                 {notificationCount > 0 && (
-                  <Badge
-                    className="absolute -right-0.5 -top-0.5 h-4 min-w-4 px-1 flex items-center justify-center rounded-full text-[10px] font-bold p-0"
-                  >
+                  <Badge className="absolute -right-0.5 -top-0.5 h-4 min-w-4 px-1 flex items-center justify-center rounded-full text-[10px] font-bold p-0">
                     {notificationCount}
                   </Badge>
                 )}
@@ -133,20 +124,13 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-2 px-2 py-1.5 h-auto"
-            >
+            <Button variant="ghost" className="flex items-center gap-2 px-2 py-1.5 h-auto">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user?.avatar ?? undefined} alt={user?.name} />
-                <AvatarFallback className="text-xs">
-                  {getInitials(user?.name)}
-                </AvatarFallback>
+                <AvatarFallback className="text-xs">{getInitials(user?.name)}</AvatarFallback>
               </Avatar>
               <div className="hidden flex-col items-start sm:flex">
-                <span className="text-sm font-medium leading-none">
-                  {user?.name ?? "User"}
-                </span>
+                <span className="text-sm font-medium leading-none">{user?.name ?? "User"}</span>
                 <span className="text-xs text-muted-foreground leading-none mt-0.5">
                   {user?.email ?? ""}
                 </span>
