@@ -33,6 +33,7 @@ const nextConfig: NextConfig = {
   experimental: {
     serverComponentsExternalPackages: [],
   },
+  output: "standalone",
   poweredByHeader: false,
   reactStrictMode: true,
 };
