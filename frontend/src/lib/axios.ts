@@ -54,12 +54,17 @@ function createAxiosInstance(): AxiosInstance {
         _retry?: boolean;
       };
 
+      // Ignora o interceptor se o erro 401 vier da própria rota de login
+      if (originalRequest.url?.includes("/auth/login")) {
+        return Promise.reject(error);
+      }
+
       if (error.response?.status === 401 && !originalRequest._retry) {
         const refreshToken = getRefreshToken();
 
         if (!refreshToken) {
           clearTokens();
-          if (typeof window !== "undefined") {
+          if (typeof window !== "undefined" && window.location.pathname !== ROUTES.LOGIN) {
             window.location.href = ROUTES.LOGIN;
           }
           return Promise.reject(error);
@@ -87,11 +92,14 @@ function createAxiosInstance(): AxiosInstance {
             { refreshToken }
           );
 
-          const { accessToken, refreshToken: newRefreshToken } = response.data;
+          const accessToken = response.data.accessToken || (response.data as any).access_token;
+          const newRefreshToken =
+            response.data.refreshToken || (response.data as any).refresh_token;
           setTokens(accessToken, newRefreshToken);
 
           if (instance.defaults.headers) {
-            (instance.defaults.headers as Record<string, string>).Authorization = `Bearer ${accessToken}`;
+            (instance.defaults.headers as Record<string, string>).Authorization =
+              `Bearer ${accessToken}`;
           }
 
           processQueue(null, accessToken);
@@ -103,9 +111,15 @@ function createAxiosInstance(): AxiosInstance {
           return instance(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError as AxiosError, null);
-          clearTokens();
-          if (typeof window !== "undefined") {
-            window.location.href = ROUTES.LOGIN;
+
+          // Só desloga o usuário se o erro for 4xx (Client Error = Refresh token inválido/expirado)
+          // Erros 5xx (Server Error) ou falhas de rede não devem deslogar o usuário.
+          const status = (refreshError as AxiosError).response?.status;
+          if (status && status >= 400 && status < 500) {
+            clearTokens();
+            if (typeof window !== "undefined" && window.location.pathname !== ROUTES.LOGIN) {
+              window.location.href = ROUTES.LOGIN;
+            }
           }
           return Promise.reject(refreshError);
         } finally {

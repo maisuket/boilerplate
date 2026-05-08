@@ -52,18 +52,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = useCallback(async (email: string, password: string) => {
     const payload: LoginPayload = { email, password };
     const response = await authService.login(payload);
-    setTokens(response.accessToken, response.refreshToken);
-    setUser(response.user);
+
+    const data = (response as any).data || response;
+    const accessToken = data.accessToken || data.access_token;
+    const refreshToken = data.refreshToken || data.refresh_token;
+
+    setTokens(accessToken, refreshToken);
+    setUser(data.user);
   }, []);
 
-  const register = useCallback(
-    async (name: string, email: string, password: string) => {
-      const response = await authService.register({ name, email, password });
-      setTokens(response.accessToken, response.refreshToken);
-      setUser(response.user);
-    },
-    []
-  );
+  const register = useCallback(async (name: string, email: string, password: string) => {
+    const response = await authService.register({ name, email, password });
+
+    const data = (response as any).data || response;
+    const accessToken = data.accessToken || data.access_token;
+    const refreshToken = data.refreshToken || data.refresh_token;
+
+    setTokens(accessToken, refreshToken);
+    setUser(data.user);
+  }, []);
 
   const logout = useCallback(async () => {
     try {

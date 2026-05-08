@@ -18,22 +18,26 @@ const REFRESH_COOKIE_OPTIONS = {
  * Retrieves the access token from cookies
  */
 export function getAccessToken(): string | undefined {
-  return Cookies.get(AUTH_TOKEN_KEY);
+  const token = Cookies.get(AUTH_TOKEN_KEY);
+  return token === "undefined" || token === "null" ? undefined : token;
 }
 
 /**
  * Retrieves the refresh token from cookies
  */
 export function getRefreshToken(): string | undefined {
-  return Cookies.get(REFRESH_TOKEN_KEY);
+  const token = Cookies.get(REFRESH_TOKEN_KEY);
+  return token === "undefined" || token === "null" ? undefined : token;
 }
 
 /**
  * Stores both access and refresh tokens in cookies
  */
 export function setTokens(accessToken: string, refreshToken?: string): void {
-  Cookies.set(AUTH_TOKEN_KEY, accessToken, COOKIE_OPTIONS);
-  if (refreshToken) {
+  if (accessToken && accessToken !== "undefined" && accessToken !== "null") {
+    Cookies.set(AUTH_TOKEN_KEY, accessToken, COOKIE_OPTIONS);
+  }
+  if (refreshToken && refreshToken !== "undefined" && refreshToken !== "null") {
     Cookies.set(REFRESH_TOKEN_KEY, refreshToken, REFRESH_COOKIE_OPTIONS);
   }
 }
