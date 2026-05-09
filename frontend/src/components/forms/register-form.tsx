@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { registerSchema, type RegisterFormData } from "@/schemas/auth.schema";
 import { ROUTES } from "@/constants/routes";
 import { getErrorMessage } from "@/utils/error";
+import { PasswordStrengthIndicator } from "./password-strength-indicator";
 
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -62,9 +63,7 @@ export function RegisterForm() {
           disabled={isLoading}
           {...register("name")}
         />
-        {errors.name && (
-          <p className="text-sm text-destructive">{errors.name.message}</p>
-        )}
+        {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
       </div>
 
       <div className="space-y-2">
@@ -78,9 +77,7 @@ export function RegisterForm() {
           disabled={isLoading}
           {...register("email")}
         />
-        {errors.email && (
-          <p className="text-sm text-destructive">{errors.email.message}</p>
-        )}
+        {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
       </div>
 
       <div className="space-y-2">
@@ -105,9 +102,7 @@ export function RegisterForm() {
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-        {errors.password && (
-          <p className="text-sm text-destructive">{errors.password.message}</p>
-        )}
+        {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
       </div>
 
       <div className="space-y-2">
@@ -129,11 +124,7 @@ export function RegisterForm() {
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             tabIndex={-1}
           >
-            {showConfirmPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
+            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
         {errors.confirmPassword && (
@@ -142,34 +133,7 @@ export function RegisterForm() {
       </div>
 
       {/* Password strength indicator */}
-      {password && (
-        <div className="space-y-1">
-          <div className="flex gap-1">
-            {[1, 2, 3, 4].map((level) => {
-              const strength = getPasswordStrength(password);
-              return (
-                <div
-                  key={level}
-                  className={`h-1 flex-1 rounded-full transition-colors ${
-                    level <= strength
-                      ? strength === 1
-                        ? "bg-destructive"
-                        : strength === 2
-                        ? "bg-warning"
-                        : strength === 3
-                        ? "bg-info"
-                        : "bg-success"
-                      : "bg-muted"
-                  }`}
-                />
-              );
-            })}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            {getPasswordStrengthLabel(getPasswordStrength(password))}
-          </p>
-        </div>
-      )}
+      <PasswordStrengthIndicator password={password} />
 
       <Button type="submit" className="w-full" loading={isLoading}>
         Create Account
@@ -177,30 +141,14 @@ export function RegisterForm() {
 
       <p className="text-center text-xs text-muted-foreground">
         By creating an account, you agree to our{" "}
-        <a href="#" className="text-primary hover:underline">Terms of Service</a>
-        {" "}and{" "}
-        <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+        <a href="#" className="text-primary hover:underline">
+          Terms of Service
+        </a>{" "}
+        and{" "}
+        <a href="#" className="text-primary hover:underline">
+          Privacy Policy
+        </a>
       </p>
     </form>
   );
-}
-
-function getPasswordStrength(password: string): number {
-  let strength = 0;
-  if (password.length >= 8) strength++;
-  if (/[A-Z]/.test(password)) strength++;
-  if (/[0-9]/.test(password)) strength++;
-  if (/[^A-Za-z0-9]/.test(password)) strength++;
-  return strength;
-}
-
-function getPasswordStrengthLabel(strength: number): string {
-  switch (strength) {
-    case 0:
-    case 1: return "Weak password";
-    case 2: return "Fair password";
-    case 3: return "Good password";
-    case 4: return "Strong password";
-    default: return "";
-  }
 }
