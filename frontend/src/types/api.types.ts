@@ -1,3 +1,5 @@
+import { UserRole } from "@/constants/roles";
+
 /**
  * Standard API response wrapper
  */
@@ -65,6 +67,8 @@ export interface ListQueryParams {
   page?: number;
   limit?: number;
   search?: string;
+  status?: string;
+  role?: UserRole;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
 }

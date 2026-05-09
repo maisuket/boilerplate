@@ -90,7 +90,7 @@ export default function UsersPage() {
     status: statusFilter || undefined,
     role: roleFilter || undefined,
     sortBy: getFilter("sortBy") || undefined,
-    sortOrder: getFilter("sortOrder") || undefined,
+    sortOrder: (getFilter("sortOrder") as "asc" | "desc") || undefined,
   });
 
   useEffect(() => {

@@ -11,7 +11,7 @@ interface UseUsersOptions {
   status?: string;
   role?: string;
   sortBy?: string;
-  sortOrder?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 export function useUsers({
