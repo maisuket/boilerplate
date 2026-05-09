@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2, Eye, EyeOff, Copy, Check } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import { usersService } from "@/services/users.service";
 import type { User } from "@/types/user.types";
 import { getErrorMessage } from "@/utils/error";
 import { PasswordStrengthIndicator } from "./password-strength-indicator";
+import { PasswordInput } from "./password-input";
 
 const resetPasswordSchema = z
   .object({
@@ -50,8 +51,6 @@ interface ResetPasswordDialogProps {
 export function ResetPasswordDialog({ user, onClose, onSuccess }: ResetPasswordDialogProps) {
   const toast = useToast();
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
 
   const {
     register,
@@ -93,6 +92,7 @@ export function ResetPasswordDialog({ user, onClose, onSuccess }: ResetPasswordD
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       reset();
+      setShowPassword(false);
       onClose();
     }
   };
@@ -125,13 +125,6 @@ export function ResetPasswordDialog({ user, onClose, onSuccess }: ResetPasswordD
     setShowPassword(true); // Mostra a senha em texto limpo
   };
 
-  const handleCopyPassword = () => {
-    if (!password) return;
-    navigator.clipboard.writeText(password);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
-  };
-
   return (
     <Dialog open={!!user} onOpenChange={handleOpenChange}>
       <DialogContent>
@@ -155,41 +148,17 @@ export function ResetPasswordDialog({ user, onClose, onSuccess }: ResetPasswordD
                   Generate random password
                 </button>
               </div>
-              <div className="relative">
-                <Input
-                  id="new-password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  error={!!errors.password}
-                  disabled={resetMutation.isPending}
-                  className="pr-16"
-                  {...register("password")}
-                />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleCopyPassword}
-                    disabled={!password}
-                    className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    tabIndex={-1}
-                    title="Copy password"
-                  >
-                    {isCopied ? (
-                      <Check className="h-4 w-4 text-emerald-500" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                    tabIndex={-1}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
+              <PasswordInput
+                id="new-password"
+                placeholder="••••••••"
+                error={!!errors.password}
+                disabled={resetMutation.isPending}
+                showCopy
+                passwordValue={password}
+                showPassword={showPassword}
+                onShowPasswordChange={setShowPassword}
+                {...register("password")}
+              />
               {errors.password && (
                 <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
@@ -199,29 +168,13 @@ export function ResetPasswordDialog({ user, onClose, onSuccess }: ResetPasswordD
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirm New Password</Label>
-              <div className="relative">
-                <Input
-                  id="confirm-password"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  error={!!errors.confirmPassword}
-                  disabled={resetMutation.isPending}
-                  className="pr-10"
-                  {...register("confirmPassword")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  tabIndex={-1}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
+              <PasswordInput
+                id="confirm-password"
+                placeholder="••••••••"
+                error={!!errors.confirmPassword}
+                disabled={resetMutation.isPending}
+                {...register("confirmPassword")}
+              />
               {errors.confirmPassword && (
                 <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
               )}

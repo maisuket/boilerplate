@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,10 +13,9 @@ import { registerSchema, type RegisterFormData } from "@/schemas/auth.schema";
 import { ROUTES } from "@/constants/routes";
 import { getErrorMessage } from "@/utils/error";
 import { PasswordStrengthIndicator } from "./password-strength-indicator";
+import { PasswordInput } from "./password-input";
 
 export function RegisterForm() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register: registerUser, isLoading } = useAuth();
   const router = useRouter();
   const toast = useToast();
@@ -82,51 +79,27 @@ export function RegisterForm() {
 
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
-        <div className="relative">
-          <Input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            placeholder="At least 8 characters"
-            autoComplete="new-password"
-            error={!!errors.password}
-            disabled={isLoading}
-            className="pr-10"
-            {...register("password")}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            tabIndex={-1}
-          >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
-        </div>
+        <PasswordInput
+          id="password"
+          placeholder="At least 8 characters"
+          autoComplete="new-password"
+          error={!!errors.password}
+          disabled={isLoading}
+          {...register("password")}
+        />
         {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="confirmPassword">Confirm password</Label>
-        <div className="relative">
-          <Input
-            id="confirmPassword"
-            type={showConfirmPassword ? "text" : "password"}
-            placeholder="Repeat your password"
-            autoComplete="new-password"
-            error={!!errors.confirmPassword}
-            disabled={isLoading}
-            className="pr-10"
-            {...register("confirmPassword")}
-          />
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            tabIndex={-1}
-          >
-            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
-        </div>
+        <PasswordInput
+          id="confirmPassword"
+          placeholder="Repeat your password"
+          autoComplete="new-password"
+          error={!!errors.confirmPassword}
+          disabled={isLoading}
+          {...register("confirmPassword")}
+        />
         {errors.confirmPassword && (
           <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
         )}

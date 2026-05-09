@@ -22,6 +22,8 @@ import { useToast } from "@/hooks/use-toast";
 import { usersService } from "@/services/users.service";
 import { createUserSchema, type CreateUserFormData } from "@/schemas/user.schema";
 import { getErrorMessage } from "@/utils/error";
+import { PasswordStrengthIndicator } from "./password-strength-indicator";
+import { PasswordInput } from "./password-input";
 
 interface AddUserDialogProps {
   onSuccess?: () => void;
@@ -29,12 +31,15 @@ interface AddUserDialogProps {
 
 export function AddUserDialog({ onSuccess }: AddUserDialogProps) {
   const [open, setOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const toast = useToast();
 
   const {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
@@ -45,6 +50,8 @@ export function AddUserDialog({ onSuccess }: AddUserDialogProps) {
       role: "USER",
     },
   });
+
+  const password = watch("password");
 
   const createMutation = useMutation({
     mutationFn: usersService.createUser,
@@ -67,7 +74,35 @@ export function AddUserDialog({ onSuccess }: AddUserDialogProps) {
     setOpen(newOpen);
     if (!newOpen) {
       reset();
+      setShowPassword(false);
     }
+  };
+
+  const handleGeneratePassword = () => {
+    const length = 12;
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const numbers = "0123456789";
+    const specials = "!@#$%^&*()_+~`|}{[]:;?><,./-=";
+
+    let generated = "";
+    generated += uppercase[Math.floor(Math.random() * uppercase.length)];
+    generated += lowercase[Math.floor(Math.random() * lowercase.length)];
+    generated += numbers[Math.floor(Math.random() * numbers.length)];
+    generated += specials[Math.floor(Math.random() * specials.length)];
+
+    const allChars = uppercase + lowercase + numbers + specials;
+    for (let i = generated.length; i < length; i++) {
+      generated += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+
+    generated = generated
+      .split("")
+      .sort(() => 0.5 - Math.random())
+      .join("");
+
+    setValue("password", generated, { shouldValidate: true, shouldDirty: true });
+    setShowPassword(true);
   };
 
   return (
@@ -111,18 +146,34 @@ export function AddUserDialog({ onSuccess }: AddUserDialogProps) {
               {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <button
+                  type="button"
+                  onClick={handleGeneratePassword}
+                  className="text-xs text-primary hover:underline"
+                  tabIndex={-1}
+                >
+                  Generate random password
+                </button>
+              </div>
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="••••••••"
                 error={!!errors.password}
                 disabled={createMutation.isPending}
+                showCopy
+                passwordValue={password}
+                showPassword={showPassword}
+                onShowPasswordChange={setShowPassword}
                 {...register("password")}
               />
               {errors.password && (
                 <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
+              <div className="pt-2">
+                <PasswordStrengthIndicator password={password} />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
