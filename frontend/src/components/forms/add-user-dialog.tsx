@@ -21,6 +21,7 @@ import { createUserSchema, type CreateUserFormData } from "@/schemas/user.schema
 import { PasswordInput } from "./password-input";
 import { useCreateUser } from "@/hooks/use-user-mutations";
 import { USER_ROLES } from "@/constants/roles";
+import { generateRandomPassword } from "@/utils/password";
 
 export function AddUserDialog() {
   const [open, setOpen] = useState(false);
@@ -65,27 +66,7 @@ export function AddUserDialog() {
   };
 
   const handleGeneratePassword = () => {
-    const length = 12;
-    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const lowercase = "abcdefghijklmnopqrstuvwxyz";
-    const numbers = "0123456789";
-    const specials = "!@#$%^&*()_+~`|}{[]:;?><,./-=";
-
-    let generated = "";
-    generated += uppercase[Math.floor(Math.random() * uppercase.length)];
-    generated += lowercase[Math.floor(Math.random() * lowercase.length)];
-    generated += numbers[Math.floor(Math.random() * numbers.length)];
-    generated += specials[Math.floor(Math.random() * specials.length)];
-
-    const allChars = uppercase + lowercase + numbers + specials;
-    for (let i = generated.length; i < length; i++) {
-      generated += allChars[Math.floor(Math.random() * allChars.length)];
-    }
-
-    generated = generated
-      .split("")
-      .sort(() => 0.5 - Math.random())
-      .join("");
+    const generated = generateRandomPassword();
 
     setValue("password", generated, { shouldValidate: true, shouldDirty: true });
     setShowPassword(true);
@@ -137,8 +118,9 @@ export function AddUserDialog() {
                 <button
                   type="button"
                   onClick={handleGeneratePassword}
-                  className="text-xs text-primary hover:underline"
+                  className="text-xs text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                   tabIndex={-1}
+                  disabled={createMutation.isPending}
                 >
                   Generate random password
                 </button>

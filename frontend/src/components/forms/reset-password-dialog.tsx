@@ -19,6 +19,7 @@ import {
 import type { User } from "@/types/user.types";
 import { PasswordInput } from "./password-input";
 import { useUpdateUser } from "@/hooks/use-user-mutations";
+import { generateRandomPassword } from "@/utils/password";
 
 const resetPasswordSchema = z
   .object({
@@ -86,27 +87,7 @@ export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps)
   };
 
   const handleGeneratePassword = () => {
-    const length = 12;
-    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const lowercase = "abcdefghijklmnopqrstuvwxyz";
-    const numbers = "0123456789";
-    const specials = "!@#$%^&*()_+~`|}{[]:;?><,./-=";
-
-    let generated = "";
-    generated += uppercase[Math.floor(Math.random() * uppercase.length)];
-    generated += lowercase[Math.floor(Math.random() * lowercase.length)];
-    generated += numbers[Math.floor(Math.random() * numbers.length)];
-    generated += specials[Math.floor(Math.random() * specials.length)];
-
-    const allChars = uppercase + lowercase + numbers + specials;
-    for (let i = generated.length; i < length; i++) {
-      generated += allChars[Math.floor(Math.random() * allChars.length)];
-    }
-
-    generated = generated
-      .split("")
-      .sort(() => 0.5 - Math.random())
-      .join("");
+    const generated = generateRandomPassword();
 
     setValue("password", generated, { shouldValidate: true, shouldDirty: true });
     setValue("confirmPassword", generated, { shouldValidate: true, shouldDirty: true });
@@ -130,8 +111,9 @@ export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps)
                 <button
                   type="button"
                   onClick={handleGeneratePassword}
-                  className="text-xs text-primary hover:underline"
+                  className="text-xs text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                   tabIndex={-1}
+                  disabled={resetMutation.isPending}
                 >
                   Generate random password
                 </button>

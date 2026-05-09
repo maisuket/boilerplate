@@ -46,8 +46,7 @@ export function ProfileForm() {
   }, [user, reset]);
 
   const updateMutation = useMutation({
-    mutationFn: (data: ProfileFormData) =>
-      usersService.updateUser(user!.id, data),
+    mutationFn: (data: ProfileFormData) => usersService.updateUser(user!.id, data),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.auth.me() });
       await refreshUser();
@@ -64,7 +63,12 @@ export function ProfileForm() {
 
   const getInitials = (name?: string) => {
     if (!name) return "U";
-    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
@@ -77,10 +81,7 @@ export function ProfileForm() {
         <div>
           <p className="text-sm font-medium">{user?.name}</p>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
-          <button
-            type="button"
-            className="mt-2 text-xs text-primary hover:underline"
-          >
+          <button type="button" className="mt-2 text-xs text-primary hover:underline">
             Change avatar
           </button>
         </div>
@@ -97,9 +98,7 @@ export function ProfileForm() {
             disabled={updateMutation.isPending}
             {...register("name")}
           />
-          {errors.name && (
-            <p className="text-sm text-destructive">{errors.name.message}</p>
-          )}
+          {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -112,9 +111,7 @@ export function ProfileForm() {
             disabled={updateMutation.isPending}
             {...register("email")}
           />
-          {errors.email && (
-            <p className="text-sm text-destructive">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
         </div>
 
         <div className="space-y-2 sm:col-span-2">
@@ -127,19 +124,13 @@ export function ProfileForm() {
             disabled={updateMutation.isPending}
             {...register("avatar")}
           />
-          {errors.avatar && (
-            <p className="text-sm text-destructive">{errors.avatar.message}</p>
-          )}
+          {errors.avatar && <p className="text-sm text-destructive">{errors.avatar.message}</p>}
         </div>
       </div>
 
       <div className="flex gap-3">
-        <Button
-          type="submit"
-          loading={updateMutation.isPending}
-          disabled={!isDirty}
-        >
-          Save Changes
+        <Button type="submit" loading={updateMutation.isPending} disabled={!isDirty}>
+          {updateMutation.isPending ? "Saving..." : "Save Changes"}
         </Button>
         <Button
           type="button"

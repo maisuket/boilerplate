@@ -1,29 +1,6 @@
 "use client";
 
-export function getPasswordStrength(password: string): number {
-  let strength = 0;
-  if (password.length >= 8) strength++;
-  if (/[A-Z]/.test(password)) strength++;
-  if (/[0-9]/.test(password)) strength++;
-  if (/[^A-Za-z0-9]/.test(password)) strength++;
-  return strength;
-}
-
-export function getPasswordStrengthLabel(strength: number): string {
-  switch (strength) {
-    case 0:
-    case 1:
-      return "Weak password";
-    case 2:
-      return "Fair password";
-    case 3:
-      return "Good password";
-    case 4:
-      return "Strong password";
-    default:
-      return "";
-  }
-}
+import { getPasswordStrength, getPasswordStrengthLabel } from "@/utils/password";
 
 interface PasswordStrengthIndicatorProps {
   password?: string;

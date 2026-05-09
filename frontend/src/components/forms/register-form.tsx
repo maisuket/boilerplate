@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,8 +14,10 @@ import { registerSchema, type RegisterFormData } from "@/schemas/auth.schema";
 import { ROUTES } from "@/constants/routes";
 import { getErrorMessage } from "@/utils/error";
 import { PasswordInput } from "./password-input";
+import { generateRandomPassword } from "@/utils/password";
 
 export function RegisterForm() {
+  const [showPassword, setShowPassword] = useState(false);
   const { register: registerUser, isLoading } = useAuth();
   const router = useRouter();
   const toast = useToast();
@@ -24,6 +27,7 @@ export function RegisterForm() {
     handleSubmit,
     formState: { errors },
     watch,
+    setValue,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -44,6 +48,14 @@ export function RegisterForm() {
     } catch (error) {
       toast.error("Registration failed", getErrorMessage(error));
     }
+  };
+
+  const handleGeneratePassword = () => {
+    const generated = generateRandomPassword();
+
+    setValue("password", generated, { shouldValidate: true, shouldDirty: true });
+    setValue("confirmPassword", generated, { shouldValidate: true, shouldDirty: true });
+    setShowPassword(true);
   };
 
   return (
@@ -77,14 +89,28 @@ export function RegisterForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password">Password</Label>
+          <button
+            type="button"
+            onClick={handleGeneratePassword}
+            className="text-xs text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+            tabIndex={-1}
+            disabled={isLoading}
+          >
+            Generate random password
+          </button>
+        </div>
         <PasswordInput
           id="password"
           placeholder="At least 8 characters"
           autoComplete="new-password"
           error={!!errors.password}
           disabled={isLoading}
+          showCopy
           passwordValue={password}
+          showPassword={showPassword}
+          onShowPasswordChange={setShowPassword}
           showStrengthIndicator
           {...register("password")}
         />
@@ -107,7 +133,7 @@ export function RegisterForm() {
       </div>
 
       <Button type="submit" className="w-full" loading={isLoading}>
-        Create Account
+        {isLoading ? "Creating account..." : "Create Account"}
       </Button>
 
       <p className="text-center text-xs text-muted-foreground">

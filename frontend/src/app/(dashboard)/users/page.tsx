@@ -334,7 +334,7 @@ export default function UsersPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(Math.max(1, page - 1))}
-                  disabled={page <= 1}
+                  disabled={page <= 1 || isLoading}
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   Previous
@@ -343,7 +343,7 @@ export default function UsersPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
-                  disabled={page >= totalPages}
+                  disabled={page >= totalPages || isLoading}
                 >
                   Next
                   <ChevronRight className="h-4 w-4 ml-1" />
