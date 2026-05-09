@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, Bell, Sun, Moon, Monitor, LogOut, User, Settings, ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -102,7 +103,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-
+        <LanguageSwitcher />
         {/* Notifications */}
         <TooltipProvider>
           <Tooltip>

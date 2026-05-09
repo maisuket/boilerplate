@@ -1,0 +1,15 @@
+{
+  "cookieConsent": {
+    "title": "Nós valorizamos sua privacidade",
+    "description": "Utilizamos cookies essenciais para o funcionamento da plataforma e para melhorar sua experiência. Ao continuar navegando, você concorda com nossas políticas.",
+    "readTerms": "Ler os Termos",
+    "accept": "Aceitar Cookies"
+  },
+  "validation": {
+    "passwordMinLength": "A senha deve ter pelo menos 8 caracteres",
+    "passwordUppercase": "A senha deve conter pelo menos uma letra maiúscula",
+    "passwordNumber": "A senha deve conter pelo menos um número",
+    "passwordSpecial": "A senha deve conter pelo menos um caractere especial",
+    "passwordsMismatch": "As senhas não coincidem"
+  }
+}

@@ -1,17 +1,7 @@
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 
-import { ROUTES } from "@/constants/routes";
-import { AUTH_TOKEN_KEY } from "@/constants/app";
-
-export default async function RootPage() {
-  const cookieStore = await cookies();
-
-  const token = cookieStore.get(AUTH_TOKEN_KEY);
-
-  if (token?.value) {
-    redirect(ROUTES.DASHBOARD);
-  } else {
-    redirect(ROUTES.LOGIN);
-  }
+// Este é um fallback físico. Na prática, o middleware.ts intercepta a rota '/'
+// antes de chegar aqui e já faz o redirecionamento baseado no idioma do navegador.
+export default function RootPage() {
+  redirect("/en");
 }

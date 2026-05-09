@@ -1,0 +1,15 @@
+{
+  "cookieConsent": {
+    "title": "We value your privacy",
+    "description": "We use essential cookies for the platform to function and to improve your experience. By continuing to browse, you agree to our policies.",
+    "readTerms": "Read Terms",
+    "accept": "Accept Cookies"
+  },
+  "validation": {
+    "passwordMinLength": "Password must be at least 8 characters long",
+    "passwordUppercase": "Password must contain at least one uppercase letter",
+    "passwordNumber": "Password must contain at least one number",
+    "passwordSpecial": "Password must contain at least one special character",
+    "passwordsMismatch": "Passwords do not match"
+  }
+}

@@ -22,23 +22,25 @@ import { useUpdateUser } from "@/hooks/use-user-mutations";
 import { generateRandomPassword } from "@/utils/password";
 import { useModalWarning } from "@/hooks/use-modal-warning";
 import { UnsavedChangesDialog } from "@/components/dialogs/unsaved-changes-dialog";
+import { useTranslations } from "next-intl";
 
-const resetPasswordSchema = z
-  .object({
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters long")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number")
-      .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+const getResetPasswordSchema = (t: any) =>
+  z
+    .object({
+      password: z
+        .string()
+        .min(8, t("passwordMinLength"))
+        .regex(/[A-Z]/, t("passwordUppercase"))
+        .regex(/[0-9]/, t("passwordNumber"))
+        .regex(/[^A-Za-z0-9]/, t("passwordSpecial")),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("passwordsMismatch"),
+      path: ["confirmPassword"],
+    });
 
-type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
+type ResetPasswordFormData = z.infer<ReturnType<typeof getResetPasswordSchema>>;
 
 interface ResetPasswordDialogProps {
   user: User | null;
@@ -47,6 +49,8 @@ interface ResetPasswordDialogProps {
 
 export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const t = useTranslations("validation");
+  const resetPasswordSchema = getResetPasswordSchema(t);
 
   const {
     register,

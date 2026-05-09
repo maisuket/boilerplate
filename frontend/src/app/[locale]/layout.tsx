@@ -10,6 +10,9 @@ import { APP_DESCRIPTION, APP_NAME } from "@/constants/app";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ProgressProvider } from "@/providers/progress-provider";
+import { CookieConsent } from "@/components/layout/cookie-consent";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -46,13 +49,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params: { locale },
 }: Readonly<{
   children: React.ReactNode;
+  params: { locale: string };
 }>) {
+  const messages = await getMessages();
+
   return (
-    <html lang="en" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
+    <html lang={locale} suppressHydrationWarning className={cn("font-sans", geist.variable)}>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ProgressProvider />
         <ThemeProvider
@@ -62,7 +69,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <NextIntlClientProvider messages={messages}>
+              <AuthProvider>{children}</AuthProvider>
+              <CookieConsent />
+            </NextIntlClientProvider>
           </QueryProvider>
           <Toaster position="top-right" richColors closeButton duration={4000} />
         </ThemeProvider>

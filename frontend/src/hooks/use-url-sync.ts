@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "@/components/layout/routing";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export function useUrlSync(delayMs = 400) {
