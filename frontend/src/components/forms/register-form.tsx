@@ -12,7 +12,6 @@ import { useToast } from "@/hooks/use-toast";
 import { registerSchema, type RegisterFormData } from "@/schemas/auth.schema";
 import { ROUTES } from "@/constants/routes";
 import { getErrorMessage } from "@/utils/error";
-import { PasswordStrengthIndicator } from "./password-strength-indicator";
 import { PasswordInput } from "./password-input";
 
 export function RegisterForm() {
@@ -85,6 +84,8 @@ export function RegisterForm() {
           autoComplete="new-password"
           error={!!errors.password}
           disabled={isLoading}
+          passwordValue={password}
+          showStrengthIndicator
           {...register("password")}
         />
         {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
@@ -104,9 +105,6 @@ export function RegisterForm() {
           <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
         )}
       </div>
-
-      {/* Password strength indicator */}
-      <PasswordStrengthIndicator password={password} />
 
       <Button type="submit" className="w-full" loading={isLoading}>
         Create Account
