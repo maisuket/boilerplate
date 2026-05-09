@@ -10,9 +10,16 @@ interface TabsSyncProps extends Omit<
 > {
   defaultValue: string;
   queryKey?: string;
+  onTabChangeIntercept?: (value: string, proceed: () => void) => void;
 }
 
-export function TabsSync({ defaultValue, queryKey = "tab", children, ...props }: TabsSyncProps) {
+export function TabsSync({
+  defaultValue,
+  queryKey = "tab",
+  onTabChangeIntercept,
+  children,
+  ...props
+}: TabsSyncProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -20,9 +27,17 @@ export function TabsSync({ defaultValue, queryKey = "tab", children, ...props }:
   const currentTab = searchParams.get(queryKey) || defaultValue;
 
   const handleTabChange = (value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(queryKey, value);
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    const proceed = () => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(queryKey, value);
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
+    if (onTabChangeIntercept) {
+      onTabChangeIntercept(value, proceed);
+    } else {
+      proceed();
+    }
   };
 
   return (

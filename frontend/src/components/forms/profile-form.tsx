@@ -16,7 +16,11 @@ import { usersService } from "@/services/users.service";
 import { QUERY_KEYS } from "@/constants/query-keys";
 import { getErrorMessage } from "@/utils/error";
 
-export function ProfileForm() {
+interface ProfileFormProps {
+  onDirtyChange?: (isDirty: boolean) => void;
+}
+
+export function ProfileForm({ onDirtyChange }: ProfileFormProps = {}) {
   const { user, refreshUser } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -44,6 +48,14 @@ export function ProfileForm() {
       });
     }
   }, [user, reset]);
+
+  // Avisa a página pai quando o formulário é modificado (e limpa quando desmontado)
+  useEffect(() => {
+    if (onDirtyChange) {
+      onDirtyChange(isDirty);
+    }
+    return () => onDirtyChange?.(false);
+  }, [isDirty, onDirtyChange]);
 
   const updateMutation = useMutation({
     mutationFn: (data: ProfileFormData) => usersService.updateUser(user!.id, data),

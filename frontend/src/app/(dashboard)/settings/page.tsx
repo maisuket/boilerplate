@@ -1,12 +1,50 @@
 "use client";
 
+import { useState, useCallback } from "react";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsSync } from "@/components/ui/tabs-sync";
 import { ProfileForm } from "@/components/forms/profile-form";
 import { ChangePasswordForm } from "@/components/forms/change-password-form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useLeaveWarning } from "@/hooks/use-leave-warning";
 
 export default function SettingsPage() {
+  const [isDirty, setIsDirty] = useState(false);
+  const [pendingProceed, setPendingProceed] = useState<(() => void) | null>(null);
+
+  // Evita fechamento da página ou botão de 'voltar' do navegador se tiver alterações não salvas
+  useLeaveWarning(isDirty, (proceed) => setPendingProceed(() => proceed));
+
+  const handleTabIntercept = useCallback(
+    (value: string, proceed: () => void) => {
+      if (isDirty) {
+        setPendingProceed(() => proceed);
+      } else {
+        proceed();
+      }
+    },
+    [isDirty]
+  );
+
+  const confirmTabChange = () => {
+    if (pendingProceed) {
+      setIsDirty(false); // Reseta para evitar loops, já que o conteúdo será desmontado
+      pendingProceed();
+      setPendingProceed(null);
+    }
+  };
+
   return (
     <div className="flex flex-col space-y-8 pb-10">
       <div>
@@ -16,7 +54,11 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <TabsSync defaultValue="profile" className="space-y-6">
+      <TabsSync
+        defaultValue="profile"
+        className="space-y-6"
+        onTabChangeIntercept={handleTabIntercept}
+      >
         <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
           <TabsTrigger
             value="profile"
@@ -44,7 +86,7 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ProfileForm />
+              <ProfileForm onDirtyChange={setIsDirty} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -59,11 +101,35 @@ export default function SettingsPage() {
               <CardDescription>Update your password to keep your account secure.</CardDescription>
             </CardHeader>
             <CardContent>
-              <ChangePasswordForm />
+              <ChangePasswordForm onDirtyChange={setIsDirty} />
             </CardContent>
           </Card>
         </TabsContent>
       </TabsSync>
+
+      <AlertDialog
+        open={!!pendingProceed}
+        onOpenChange={(open) => !open && setPendingProceed(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes in this tab. If you leave now, all your modifications will be
+              permanently lost. Are you sure you want to discard them?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep Editing</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmTabChange}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Discard Changes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

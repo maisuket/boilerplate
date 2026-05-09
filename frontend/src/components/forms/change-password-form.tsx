@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -14,7 +14,11 @@ import { getErrorMessage } from "@/utils/error";
 import { usersService } from "@/services/users.service";
 import { generateRandomPassword } from "@/utils/password";
 
-export function ChangePasswordForm() {
+interface ChangePasswordFormProps {
+  onDirtyChange?: (isDirty: boolean) => void;
+}
+
+export function ChangePasswordForm({ onDirtyChange }: ChangePasswordFormProps = {}) {
   const toast = useToast();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -35,6 +39,14 @@ export function ChangePasswordForm() {
       confirmNewPassword: "",
     },
   });
+
+  // Avisa a página pai quando o formulário é modificado (e limpa quando desmontado)
+  useEffect(() => {
+    if (onDirtyChange) {
+      onDirtyChange(isDirty);
+    }
+    return () => onDirtyChange?.(false);
+  }, [isDirty, onDirtyChange]);
 
   const newPasswordValue = watch("newPassword");
 
