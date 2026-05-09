@@ -9,15 +9,16 @@ import {
 import { Request, Response } from 'express';
 
 interface ErrorResponse {
-  success: false;
+  success: boolean;
+  message: string;
+  data: null;
+  timestamp: string;
   error: {
     statusCode: number;
-    message: string | string[];
+    details: string | string[];
     error: string;
     path: string;
     method: string;
-    timestamp: string;
-    requestId?: string;
   };
 }
 
@@ -54,15 +55,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
       this.logger.error(`Unhandled exception: ${exception.message}`, exception.stack);
     }
 
+    const extractedMessage = Array.isArray(message) ? message[0] : message;
+
     const errorResponse: ErrorResponse = {
       success: false,
+      message: extractedMessage,
+      data: null,
+      timestamp: new Date().toISOString(),
       error: {
         statusCode: status,
-        message,
+        details: message,
         error,
         path: request.url,
         method: request.method,
-        timestamp: new Date().toISOString(),
       },
     };
 

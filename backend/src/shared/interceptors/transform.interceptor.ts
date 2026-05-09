@@ -1,28 +1,35 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-export interface TransformedResponse<T> {
+export interface ResponseFormat<T> {
   success: boolean;
   data: T;
-  message: string;
+  meta?: any;
+  message?: string;
   timestamp: string;
 }
 
 @Injectable()
-export class TransformInterceptor<T> implements NestInterceptor<T, TransformedResponse<T>> {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<TransformedResponse<T>> {
+export class TransformInterceptor<T> implements NestInterceptor<T, ResponseFormat<T>> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<ResponseFormat<T>> {
     return next.handle().pipe(
-      map(data => {
-        // If data already has our wrapper format, return as-is
-        if (data && typeof data === 'object' && 'success' in data && 'timestamp' in data) {
-          return data;
+      map(res => {
+        // Se a resposta já vier encapsulada (ex: controllers que estipulam as próprias mensagens)
+        if (res && typeof res === 'object' && 'success' in res && 'data' in res) {
+          return res;
         }
+
+        // Identifica se o controller retornou um formato de paginação ({ data: [], meta: {} })
+        const hasMeta = res && typeof res === 'object' && 'data' in res && 'meta' in res;
+        const data = hasMeta ? res.data : res !== undefined ? res : null;
+        const meta = hasMeta ? res.meta : undefined;
 
         return {
           success: true,
+          message: 'Operation completed successfully',
           data,
-          message: 'Success',
+          ...(meta !== undefined && { meta }),
           timestamp: new Date().toISOString(),
         };
       }),
