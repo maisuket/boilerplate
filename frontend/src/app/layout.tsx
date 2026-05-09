@@ -9,8 +9,9 @@ import { APP_DESCRIPTION, APP_NAME } from "@/constants/app";
 
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { ProgressProvider } from "@/providers/progress-provider";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const inter = Inter({
   subsets: ["latin"],
@@ -53,6 +54,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <ProgressProvider />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -60,16 +62,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <AuthProvider>
-              {children}
-            </AuthProvider>
+            <AuthProvider>{children}</AuthProvider>
           </QueryProvider>
-          <Toaster
-            position="top-right"
-            richColors
-            closeButton
-            duration={4000}
-          />
+          <Toaster position="top-right" richColors closeButton duration={4000} />
         </ThemeProvider>
       </body>
     </html>

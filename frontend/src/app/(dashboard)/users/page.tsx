@@ -208,7 +208,7 @@ export default function UsersPage() {
   ];
 
   return (
-    <div className="flex flex-col flex-1 space-y-4 animate-in h-[calc(100dvh-7rem)]">
+    <div className="flex flex-col flex-1 space-y-4 h-[calc(100dvh-7rem)]">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shrink-0">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Users</h1>
