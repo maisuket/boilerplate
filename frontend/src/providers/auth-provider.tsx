@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/components/layout/routing";
 
 import { authService } from "@/services/auth.service";
 import { getAccessToken, clearTokens, setTokens } from "@/lib/auth";

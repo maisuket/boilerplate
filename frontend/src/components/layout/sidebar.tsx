@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
@@ -14,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link, usePathname } from "@/components/layout/routing";
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { ROUTES } from "@/constants/routes";
 import { ScrollArea } from "../ui/scroll-area";
 import { useAuth } from "@/hooks/use-auth";
+import { useTranslations } from "next-intl";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -29,18 +29,19 @@ interface SidebarProps {
   onToggleCollapse: () => void;
 }
 
-const mainNavItems = [
-  { label: "Dashboard", href: ROUTES.DASHBOARD, icon: LayoutDashboard },
-  { label: "Projetos", href: "/projects", icon: Package },
-  { label: "Financeiro", href: "/financial", icon: ShoppingCart },
-  { label: "Equipe", href: ROUTES.USERS, icon: Users },
-];
-
-const otherNavItems = [{ label: "Settings", href: "/settings", icon: Settings }];
-
 export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const t = useTranslations("sidebar");
+
+  const mainNavItems = [
+    { label: t("dashboard"), href: ROUTES.DASHBOARD, icon: LayoutDashboard },
+    { label: t("projects"), href: "/projects", icon: Package },
+    { label: t("financial"), href: "/financial", icon: ShoppingCart },
+    { label: t("team"), href: ROUTES.USERS, icon: Users },
+  ];
+
+  const otherNavItems = [{ label: t("settings"), href: "/settings", icon: Settings }];
 
   const getInitials = (name?: string) => {
     if (!name) return "U";
@@ -102,7 +103,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
                     exit={{ opacity: 0, height: 0, marginBottom: 0 }}
                     className="text-xs font-semibold text-emerald-400/60 uppercase tracking-wider px-2 whitespace-nowrap overflow-hidden"
                   >
-                    Main Menu
+                    {t("mainMenu")}
                   </motion.h3>
                 )}
               </AnimatePresence>
@@ -161,7 +162,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
                     exit={{ opacity: 0, height: 0, marginBottom: 0 }}
                     className="text-xs font-semibold text-emerald-400/60 uppercase tracking-wider px-2 whitespace-nowrap overflow-hidden"
                   >
-                    Other
+                    {t("otherMenu")}
                   </motion.h3>
                 )}
               </AnimatePresence>
@@ -253,7 +254,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
               <Tooltip>
                 <TooltipTrigger asChild>{profileContent}</TooltipTrigger>
                 <TooltipContent side="right" sideOffset={15}>
-                  Logout
+                  {t("logout")}
                 </TooltipContent>
               </Tooltip>
             ) : (

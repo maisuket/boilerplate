@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname } from "@/components/layout/routing";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { Header } from "@/components/layout/header";

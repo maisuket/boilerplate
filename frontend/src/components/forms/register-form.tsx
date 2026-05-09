@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/components/layout/routing";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -10,17 +10,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { registerSchema, type RegisterFormData } from "@/schemas/auth.schema";
+import { getRegisterSchema, type RegisterFormData } from "@/schemas/auth.schema";
 import { ROUTES } from "@/constants/routes";
 import { getErrorMessage } from "@/utils/error";
 import { PasswordInput } from "./password-input";
 import { generateRandomPassword } from "@/utils/password";
+import { useTranslations } from "next-intl";
 
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { register: registerUser, isLoading } = useAuth();
   const router = useRouter();
   const toast = useToast();
+  const tValidation = useTranslations("validation");
 
   const {
     register,
@@ -29,7 +31,7 @@ export function RegisterForm() {
     watch,
     setValue,
   } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(getRegisterSchema(tValidation)),
     defaultValues: {
       name: "",
       email: "",

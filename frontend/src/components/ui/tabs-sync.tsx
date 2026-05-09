@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "@/components/layout/routing";
 import { Tabs } from "@/components/ui/tabs";
 
 interface TabsSyncProps extends Omit<

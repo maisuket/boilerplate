@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/components/layout/routing";
 import { Menu, Bell, Sun, Moon, Monitor, LogOut, User, Settings, ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
@@ -20,17 +20,12 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
 import { ROUTES } from "@/constants/routes";
+import { useTranslations } from "next-intl";
 
 interface HeaderProps {
   onMobileMenuToggle: () => void;
   sidebarCollapsed: boolean;
 }
-
-const themeOptions = [
-  { value: "light", label: "Light", icon: Sun },
-  { value: "dark", label: "Dark", icon: Moon },
-  { value: "system", label: "System", icon: Monitor },
-];
 
 export function Header({ onMobileMenuToggle }: HeaderProps) {
   const { theme, setTheme } = useTheme();
@@ -38,10 +33,17 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
   const router = useRouter();
   const [notificationCount] = useState(3);
   const [mounted, setMounted] = useState(false);
+  const t = useTranslations("header");
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const themeOptions = [
+    { value: "light", label: t("light"), icon: Sun },
+    { value: "dark", label: t("dark"), icon: Moon },
+    { value: "system", label: t("system"), icon: Monitor },
+  ];
 
   const getInitials = (name?: string) => {
     if (!name) return "U";
@@ -90,7 +92,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                   </Button>
                 </DropdownMenuTrigger>
               </TooltipTrigger>
-              <TooltipContent>Theme</TooltipContent>
+              <TooltipContent>{t("theme")}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <DropdownMenuContent align="end">
@@ -118,7 +120,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                 <span className="sr-only">Notifications</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Notifications</TooltipContent>
+            <TooltipContent>{t("notifications")}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
 
@@ -149,11 +151,11 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push(ROUTES.PROFILE)} className="gap-2">
               <User className="h-4 w-4" />
-              Profile
+              {t("profile")}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push("/settings")} className="gap-2">
               <Settings className="h-4 w-4" />
-              Settings
+              {t("settings")}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -161,7 +163,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
               className="gap-2 text-destructive focus:text-destructive"
             >
               <LogOut className="h-4 w-4" />
-              Sign out
+              {t("signOut")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
