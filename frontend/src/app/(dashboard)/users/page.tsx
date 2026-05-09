@@ -47,7 +47,7 @@ import { formatDate } from "@/utils/format";
 import { useUsers } from "@/hooks/use-users";
 import { useUrlSync } from "@/hooks/use-url-sync";
 import type { User } from "@/types/user.types";
-import { USER_ROLES } from "@/constants/roles";
+import { USER_ROLES, type UserRole } from "@/constants/roles";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -88,7 +88,7 @@ export default function UsersPage() {
     limit: ITEMS_PER_PAGE,
     search: debouncedSearch,
     status: statusFilter || undefined,
-    role: roleFilter || undefined,
+    role: (roleFilter as UserRole) || undefined,
     sortBy: getFilter("sortBy") || undefined,
     sortOrder: (getFilter("sortOrder") as "asc" | "desc") || undefined,
   });
