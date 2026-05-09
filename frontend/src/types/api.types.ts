@@ -3,6 +3,7 @@
  */
 export interface ApiResponse<T> {
   data: T;
+  meta?: PaginationMeta;
   message?: string;
   success: boolean;
 }
