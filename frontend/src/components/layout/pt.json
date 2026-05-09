@@ -10,6 +10,21 @@
     "passwordUppercase": "A senha deve conter pelo menos uma letra maiúscula",
     "passwordNumber": "A senha deve conter pelo menos um número",
     "passwordSpecial": "A senha deve conter pelo menos um caractere especial",
-    "passwordsMismatch": "As senhas não coincidem"
+    "passwordsMismatch": "As senhas não coincidem",
+    "currentPasswordRequired": "A senha atual é obrigatória",
+    "passwordMaxLength": "A senha deve ter menos de 100 caracteres",
+    "passwordLowercase": "A senha deve conter pelo menos uma letra minúscula",
+    "confirmNewPasswordRequired": "Por favor, confirme sua nova senha",
+    "newPasswordDifferent": "A nova senha deve ser diferente da senha atual",
+    "nameRequired": "O nome é obrigatório",
+    "emailRequired": "Um email válido é obrigatório",
+    "invalidUrl": "Por favor, insira uma URL válida",
+    "passwordRequired": "A senha é obrigatória",
+    "passwordMinLengthLogin": "A senha deve ter pelo menos 6 caracteres",
+    "nameMinLength": "O nome deve ter pelo menos 2 caracteres",
+    "nameMaxLength": "O nome deve ter menos de 100 caracteres",
+    "nameInvalidCharacters": "O nome só pode conter letras, espaços, hifens e apóstrofos",
+    "confirmPasswordRequired": "Por favor, confirme sua senha",
+    "invalidEmail": "Por favor, insira um endereço de email válido"
   }
 }

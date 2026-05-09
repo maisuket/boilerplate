@@ -8,11 +8,12 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { changePasswordSchema, type ChangePasswordFormData } from "@/schemas/auth.schema";
+import { getChangePasswordSchema, type ChangePasswordFormData } from "@/schemas/auth.schema";
 import { PasswordInput } from "./password-input";
 import { getErrorMessage } from "@/utils/error";
 import { usersService } from "@/services/users.service";
 import { generateRandomPassword } from "@/utils/password";
+import { useTranslations } from "next-intl";
 
 interface ChangePasswordFormProps {
   onDirtyChange?: (isDirty: boolean) => void;
@@ -23,6 +24,7 @@ export function ChangePasswordForm({ onDirtyChange }: ChangePasswordFormProps = 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const tValidation = useTranslations("validation");
 
   const {
     register,
@@ -32,7 +34,7 @@ export function ChangePasswordForm({ onDirtyChange }: ChangePasswordFormProps = 
     setValue,
     formState: { errors, isDirty },
   } = useForm<ChangePasswordFormData>({
-    resolver: zodResolver(changePasswordSchema),
+    resolver: zodResolver(getChangePasswordSchema(tValidation)),
     defaultValues: {
       currentPassword: "",
       newPassword: "",

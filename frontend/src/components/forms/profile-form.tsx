@@ -11,10 +11,11 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { profileSchema, type ProfileFormData } from "@/schemas/user.schema";
+import { getProfileSchema, type ProfileFormData } from "@/schemas/user.schema";
 import { usersService } from "@/services/users.service";
 import { QUERY_KEYS } from "@/constants/query-keys";
 import { getErrorMessage } from "@/utils/error";
+import { useTranslations } from "next-intl";
 
 interface ProfileFormProps {
   onDirtyChange?: (isDirty: boolean) => void;
@@ -24,6 +25,7 @@ export function ProfileForm({ onDirtyChange }: ProfileFormProps = {}) {
   const { user, refreshUser } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
+  const tValidation = useTranslations("validation");
 
   const {
     register,
@@ -31,7 +33,7 @@ export function ProfileForm({ onDirtyChange }: ProfileFormProps = {}) {
     reset,
     formState: { errors, isDirty },
   } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(getProfileSchema(tValidation)),
     defaultValues: {
       name: user?.name ?? "",
       email: user?.email ?? "",

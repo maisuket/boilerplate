@@ -10,6 +10,21 @@
     "passwordUppercase": "Password must contain at least one uppercase letter",
     "passwordNumber": "Password must contain at least one number",
     "passwordSpecial": "Password must contain at least one special character",
-    "passwordsMismatch": "Passwords do not match"
+    "passwordsMismatch": "Passwords do not match",
+    "currentPasswordRequired": "Current password is required",
+    "passwordMaxLength": "Password must be less than 100 characters",
+    "passwordLowercase": "Password must contain at least one lowercase letter",
+    "confirmNewPasswordRequired": "Please confirm your new password",
+    "newPasswordDifferent": "New password must be different from current password",
+    "nameRequired": "Name is required",
+    "emailRequired": "Valid email is required",
+    "invalidUrl": "Please enter a valid URL",
+    "passwordRequired": "Password is required",
+    "passwordMinLengthLogin": "Password must be at least 6 characters",
+    "nameMinLength": "Name must be at least 2 characters",
+    "nameMaxLength": "Name must be less than 100 characters",
+    "nameInvalidCharacters": "Name can only contain letters, spaces, hyphens and apostrophes",
+    "confirmPasswordRequired": "Please confirm your password",
+    "invalidEmail": "Please enter a valid email address"
   }
 }

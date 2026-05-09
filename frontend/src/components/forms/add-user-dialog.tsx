@@ -17,17 +17,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { createUserSchema, type CreateUserFormData } from "@/schemas/user.schema";
+import { getCreateUserSchema, type CreateUserFormData } from "@/schemas/user.schema";
 import { PasswordInput } from "./password-input";
 import { useCreateUser } from "@/hooks/use-user-mutations";
 import { USER_ROLES } from "@/constants/roles";
 import { generateRandomPassword } from "@/utils/password";
 import { useModalWarning } from "@/hooks/use-modal-warning";
 import { UnsavedChangesDialog } from "@/components/dialogs/unsaved-changes-dialog";
+import { useTranslations } from "next-intl";
 
 export function AddUserDialog() {
   const [open, setOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const tValidation = useTranslations("validation");
 
   const {
     register,
@@ -37,7 +39,7 @@ export function AddUserDialog() {
     setValue,
     formState: { errors, isDirty },
   } = useForm<CreateUserFormData>({
-    resolver: zodResolver(createUserSchema),
+    resolver: zodResolver(getCreateUserSchema(tValidation)),
     defaultValues: {
       name: "",
       email: "",
@@ -56,7 +58,7 @@ export function AddUserDialog() {
   });
 
   const handleAddUser = (data: CreateUserFormData) => {
-    createMutation.mutate({ ...data, isActive: true });
+    createMutation.mutate({ ...data, role: data.role as any, isActive: true });
   };
 
   const closeDialog = () => {

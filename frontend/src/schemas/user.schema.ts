@@ -1,45 +1,37 @@
+// c:\Users\Daisuke\Desktop\Projetos\boilerplate\frontend\src\schemas\user.schema.ts
 import { z } from "zod";
 import { USER_ROLES } from "@/constants/roles";
 
-export const profileSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(100, "Name must be less than 100 characters"),
-  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
-  avatar: z.string().url("Please enter a valid URL").or(z.literal("")).optional(),
-});
+export const getCreateUserSchema = (t: any) =>
+  z.object({
+    name: z.string().min(1, t("nameRequired")),
+    email: z.string().min(1, t("emailRequired")).email(t("invalidEmail")),
+    password: z
+      .string()
+      .min(8, t("passwordMinLength"))
+      .max(100, t("passwordMaxLength"))
+      .regex(/[a-z]/, t("passwordLowercase"))
+      .regex(/[A-Z]/, t("passwordUppercase"))
+      .regex(/[0-9]/, t("passwordNumber"))
+      .regex(/[^A-Za-z0-9]/, t("passwordSpecial")),
+    role: z.enum(USER_ROLES as unknown as [string, ...string[]]),
+  });
 
-export const createUserSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(100, "Name must be less than 100 characters"),
-  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(100, "Password must be less than 100 characters")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number")
-    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
-  role: z.enum(USER_ROLES).default("USER"),
-  isActive: z.boolean().default(true),
-});
+export const getUpdateUserSchema = (t: any) =>
+  z.object({
+    name: z.string().min(1, t("nameRequired")),
+    email: z.string().min(1, t("emailRequired")).email(t("invalidEmail")),
+    role: z.enum(USER_ROLES as unknown as [string, ...string[]]),
+    isActive: z.boolean(),
+  });
 
-export const updateUserSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(100, "Name must be less than 100 characters")
-    .optional(),
-  email: z.string().email("Please enter a valid email address").optional(),
-  avatar: z.string().url("Please enter a valid URL").or(z.literal("")).optional(),
-  role: z.enum(USER_ROLES).optional(),
-  isActive: z.boolean().optional(),
-});
+export const getProfileSchema = (t: any) =>
+  z.object({
+    name: z.string().min(1, t("nameRequired")),
+    email: z.string().min(1, t("emailRequired")).email(t("invalidEmail")),
+    avatar: z.union([z.literal(""), z.string().url(t("invalidUrl"))]).optional(),
+  });
 
-export type ProfileFormData = z.infer<typeof profileSchema>;
-export type CreateUserFormData = z.infer<typeof createUserSchema>;
-export type UpdateUserFormData = z.infer<typeof updateUserSchema>;
+export type CreateUserFormData = z.infer<ReturnType<typeof getCreateUserSchema>>;
+export type UpdateUserFormData = z.infer<ReturnType<typeof getUpdateUserSchema>>;
+export type ProfileFormData = z.infer<ReturnType<typeof getProfileSchema>>;

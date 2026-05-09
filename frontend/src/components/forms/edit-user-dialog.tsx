@@ -15,12 +15,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { updateUserSchema, type UpdateUserFormData } from "@/schemas/user.schema";
+import { getUpdateUserSchema, type UpdateUserFormData } from "@/schemas/user.schema";
 import type { User } from "@/types/user.types";
 import { useUpdateUser } from "@/hooks/use-user-mutations";
 import { USER_ROLES } from "@/constants/roles";
 import { useModalWarning } from "@/hooks/use-modal-warning";
 import { UnsavedChangesDialog } from "@/components/dialogs/unsaved-changes-dialog";
+import { useTranslations } from "next-intl";
 
 interface EditUserDialogProps {
   user: User | null;
@@ -28,13 +29,15 @@ interface EditUserDialogProps {
 }
 
 export function EditUserDialog({ user, onClose }: EditUserDialogProps) {
+  const tValidation = useTranslations("validation");
+
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isDirty },
   } = useForm<UpdateUserFormData>({
-    resolver: zodResolver(updateUserSchema),
+    resolver: zodResolver(getUpdateUserSchema(tValidation)),
     defaultValues: {
       name: "",
       email: "",
@@ -62,7 +65,7 @@ export function EditUserDialog({ user, onClose }: EditUserDialogProps) {
   });
 
   const handleEditUser = (data: UpdateUserFormData) => {
-    updateMutation.mutate({ id: user!.id, data });
+    updateMutation.mutate({ id: user!.id, data: { ...data, role: data.role as any } });
   };
 
   const closeDialog = () => {
