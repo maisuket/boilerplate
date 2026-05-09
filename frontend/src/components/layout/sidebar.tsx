@@ -62,9 +62,9 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
         {!collapsed && (
           <Link href={ROUTES.DASHBOARD} className="flex items-center gap-2">
             <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shrink-0">
-              <span className="font-bold text-white">V</span>
+              <span className="font-bold text-white">Z</span>
             </div>
-            <span className="text-xl font-bold tracking-tight">ZendaTracker</span>
+            <span className="text-xl font-bold tracking-tight">ota</span>
           </Link>
         )}
         {collapsed && (
