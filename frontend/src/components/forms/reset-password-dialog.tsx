@@ -4,8 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,12 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
-import { usersService } from "@/services/users.service";
 import type { User } from "@/types/user.types";
-import { getErrorMessage } from "@/utils/error";
-import { PasswordStrengthIndicator } from "./password-strength-indicator";
 import { PasswordInput } from "./password-input";
+import { useUpdateUser } from "@/hooks/use-user-mutations";
 
 const resetPasswordSchema = z
   .object({
@@ -45,11 +40,9 @@ type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 interface ResetPasswordDialogProps {
   user: User | null;
   onClose: () => void;
-  onSuccess?: () => void;
 }
 
-export function ResetPasswordDialog({ user, onClose, onSuccess }: ResetPasswordDialogProps) {
-  const toast = useToast();
+export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -69,24 +62,19 @@ export function ResetPasswordDialog({ user, onClose, onSuccess }: ResetPasswordD
 
   const password = watch("password");
 
-  const resetMutation = useMutation({
-    // Nota: Estamos usando o updateUser, assumindo que a sua API de PATCH permite atualizar a senha.
-    // Caso o backend possua uma rota separada (ex: resetPassword), você deve atualizar aqui.
-    mutationFn: (data: ResetPasswordFormData) =>
-      usersService.updateUser(user!.id, { password: data.password } as any),
+  const resetMutation = useUpdateUser({
+    successMessage: {
+      title: "Password reset",
+      description: "The user's password has been successfully updated.",
+    },
     onSuccess: () => {
-      toast.success("Password reset", "The user's password has been successfully updated.");
       reset();
       onClose();
-      onSuccess?.();
-    },
-    onError: (error) => {
-      toast.error("Error", getErrorMessage(error));
     },
   });
 
   const handleResetPassword = (data: ResetPasswordFormData) => {
-    resetMutation.mutate(data);
+    resetMutation.mutate({ id: user!.id, data: { password: data.password } });
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -157,14 +145,12 @@ export function ResetPasswordDialog({ user, onClose, onSuccess }: ResetPasswordD
                 passwordValue={password}
                 showPassword={showPassword}
                 onShowPasswordChange={setShowPassword}
+                showStrengthIndicator
                 {...register("password")}
               />
               {errors.password && (
                 <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
-              <div className="pt-2">
-                <PasswordStrengthIndicator password={password} />
-              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirm New Password</Label>
@@ -189,8 +175,7 @@ export function ResetPasswordDialog({ user, onClose, onSuccess }: ResetPasswordD
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={resetMutation.isPending || !isDirty}>
-              {resetMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" loading={resetMutation.isPending} disabled={!isDirty}>
               {resetMutation.isPending ? "Saving..." : "Reset Password"}
             </Button>
           </DialogFooter>

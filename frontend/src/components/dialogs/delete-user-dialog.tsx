@@ -1,8 +1,5 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,28 +10,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
-import { usersService } from "@/services/users.service";
-import { getErrorMessage } from "@/utils/error";
+import { useDeleteUser } from "@/hooks/use-user-mutations";
 
 interface DeleteUserDialogProps {
   userId: string | null;
   onClose: () => void;
-  onSuccess?: () => void;
 }
 
-export function DeleteUserDialog({ userId, onClose, onSuccess }: DeleteUserDialogProps) {
-  const toast = useToast();
-
-  const deleteMutation = useMutation({
-    mutationFn: usersService.deleteUser,
+export function DeleteUserDialog({ userId, onClose }: DeleteUserDialogProps) {
+  const deleteMutation = useDeleteUser({
     onSuccess: () => {
-      toast.success("User deleted", "The user has been successfully removed.");
-      onSuccess?.(); // Atualiza a tabela
-      onClose(); // Fecha o modal
-    },
-    onError: (error) => {
-      toast.error("Error", getErrorMessage(error));
+      onClose();
     },
   });
 
@@ -59,10 +45,9 @@ export function DeleteUserDialog({ userId, onClose, onSuccess }: DeleteUserDialo
           <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            disabled={deleteMutation.isPending}
+            loading={deleteMutation.isPending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {deleteMutation.isPending ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>

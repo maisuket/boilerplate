@@ -3,8 +3,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,21 +15,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
-import { usersService } from "@/services/users.service";
 import { updateUserSchema, type UpdateUserFormData } from "@/schemas/user.schema";
 import type { User } from "@/types/user.types";
-import { getErrorMessage } from "@/utils/error";
+import { useUpdateUser } from "@/hooks/use-user-mutations";
 
 interface EditUserDialogProps {
   user: User | null;
   onClose: () => void;
-  onSuccess?: () => void;
 }
 
-export function EditUserDialog({ user, onClose, onSuccess }: EditUserDialogProps) {
-  const toast = useToast();
-
+export function EditUserDialog({ user, onClose }: EditUserDialogProps) {
   const {
     register,
     handleSubmit,
@@ -59,20 +52,14 @@ export function EditUserDialog({ user, onClose, onSuccess }: EditUserDialogProps
     }
   }, [user, reset]);
 
-  const updateMutation = useMutation({
-    mutationFn: (data: UpdateUserFormData) => usersService.updateUser(user!.id, data),
+  const updateMutation = useUpdateUser({
     onSuccess: () => {
-      toast.success("User updated", "The user has been successfully updated.");
       onClose();
-      onSuccess?.();
-    },
-    onError: (error) => {
-      toast.error("Error", getErrorMessage(error));
     },
   });
 
   const handleEditUser = (data: UpdateUserFormData) => {
-    updateMutation.mutate(data);
+    updateMutation.mutate({ id: user!.id, data });
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -150,8 +137,7 @@ export function EditUserDialog({ user, onClose, onSuccess }: EditUserDialogProps
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={updateMutation.isPending || !isDirty}>
-              {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" loading={updateMutation.isPending} disabled={!isDirty}>
               {updateMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>

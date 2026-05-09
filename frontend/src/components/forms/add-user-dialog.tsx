@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,21 +17,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
-import { usersService } from "@/services/users.service";
 import { createUserSchema, type CreateUserFormData } from "@/schemas/user.schema";
-import { getErrorMessage } from "@/utils/error";
-import { PasswordStrengthIndicator } from "./password-strength-indicator";
 import { PasswordInput } from "./password-input";
+import { useCreateUser } from "@/hooks/use-user-mutations";
 
-interface AddUserDialogProps {
-  onSuccess?: () => void;
-}
-
-export function AddUserDialog({ onSuccess }: AddUserDialogProps) {
+export function AddUserDialog() {
   const [open, setOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const toast = useToast();
 
   const {
     register,
@@ -53,16 +44,10 @@ export function AddUserDialog({ onSuccess }: AddUserDialogProps) {
 
   const password = watch("password");
 
-  const createMutation = useMutation({
-    mutationFn: usersService.createUser,
+  const createMutation = useCreateUser({
     onSuccess: () => {
-      toast.success("User created", "The user has been successfully created.");
       setOpen(false);
       reset();
-      onSuccess?.(); // Chama a função para recarregar a tabela passada pela prop
-    },
-    onError: (error) => {
-      toast.error("Error", getErrorMessage(error));
     },
   });
 
@@ -166,14 +151,12 @@ export function AddUserDialog({ onSuccess }: AddUserDialogProps) {
                 passwordValue={password}
                 showPassword={showPassword}
                 onShowPasswordChange={setShowPassword}
+                showStrengthIndicator
                 {...register("password")}
               />
               {errors.password && (
                 <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
-              <div className="pt-2">
-                <PasswordStrengthIndicator password={password} />
-              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
@@ -201,10 +184,9 @@ export function AddUserDialog({ onSuccess }: AddUserDialogProps) {
             </Button>
             <Button
               type="submit"
-              disabled={createMutation.isPending}
+              loading={createMutation.isPending}
               className="bg-emerald-500 hover:bg-emerald-600 text-white"
             >
-              {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {createMutation.isPending ? "Creating..." : "Create User"}
             </Button>
           </DialogFooter>
