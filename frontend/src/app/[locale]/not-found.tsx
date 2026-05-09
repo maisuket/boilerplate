@@ -1,47 +1,25 @@
-"use client";
+import { useTranslations } from "next-intl";
+import { FileQuestion } from "lucide-react";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Home, Search } from "lucide-react";
-
+import { Link } from "@/components/layout/routing";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 
-export default function NotFound() {
-  const router = useRouter();
+export default function NotFoundPage() {
+  // O next-intl suporta traduções em server components na página de not-found
+  const t = useTranslations("notFound");
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
-      <div className="flex flex-col items-center space-y-6 text-center">
-        <div className="relative">
-          <div className="text-[120px] font-bold leading-none text-emerald-500/10 select-none">
-            404
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Search className="h-16 w-16 text-emerald-500/50" />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Page not found</h1>
-          <p className="max-w-md text-muted-foreground">
-            Sorry, we couldn&apos;t find the page you&apos;re looking for. It might have been moved,
-            deleted, or the URL might be incorrect.
-          </p>
-        </div>
-
-        <div className="flex gap-3">
-          <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white">
-            <Link href={ROUTES.DASHBOARD}>
-              <Home className="mr-2 h-4 w-4" />
-              Go to Dashboard
-            </Link>
-          </Button>
-          <Button variant="outline" onClick={() => router.back()}>
-            Go Back
-          </Button>
-        </div>
+    <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-4rem)] bg-background px-4 text-center">
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 mb-8">
+        <FileQuestion className="h-10 w-10 text-primary" />
       </div>
+      <h1 className="text-4xl font-bold tracking-tight mb-2">404</h1>
+      <h2 className="text-2xl font-semibold tracking-tight mb-4">{t("title")}</h2>
+      <p className="text-muted-foreground mb-8 max-w-[500px]">{t("description")}</p>
+      <Button asChild size="lg">
+        <Link href={ROUTES.DASHBOARD}>{t("backHome")}</Link>
+      </Button>
     </div>
   );
 }

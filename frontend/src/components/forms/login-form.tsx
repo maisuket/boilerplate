@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/components/layout/routing";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -10,23 +10,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { loginSchema, type LoginFormData } from "@/schemas/auth.schema";
+import { getLoginSchema, type LoginFormData } from "@/schemas/auth.schema";
 import { ROUTES } from "@/constants/routes";
 import { getErrorMessage } from "@/utils/error";
 import { PasswordInput } from "./password-input";
+import { useTranslations } from "next-intl";
 
 export function LoginForm() {
   const { login, isLoading } = useAuth();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
   const toast = useToast();
+  const tValidation = useTranslations("validation");
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(getLoginSchema(tValidation)),
     defaultValues: {
       email: "",
       password: "",

@@ -26,5 +26,65 @@
     "nameInvalidCharacters": "Name can only contain letters, spaces, hyphens and apostrophes",
     "confirmPasswordRequired": "Please confirm your password",
     "invalidEmail": "Please enter a valid email address"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "financial": "Financial",
+    "team": "Team",
+    "settings": "Settings",
+    "mainMenu": "Main Menu",
+    "otherMenu": "Other",
+    "logout": "Logout"
+  },
+  "header": {
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "settings": "Settings",
+    "signOut": "Sign out"
+  },
+  "usersTable": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "joined": "Joined",
+    "actions": "Actions",
+    "edit": "Edit",
+    "resetPassword": "Reset Password",
+    "delete": "Delete"
+  },
+  "usersPage": {
+    "title": "Users",
+    "description": "Manage your application users",
+    "allUsers": "All Users",
+    "loading": "Loading...",
+    "totalUsers": "{total} total users",
+    "searchPlaceholder": "Search users...",
+    "allStatus": "All Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "allRoles": "All Roles",
+    "errorTitle": "Failed to load users",
+    "errorDescription": "There was an error loading the users list.",
+    "tryAgain": "Try again",
+    "noUsersTitle": "No users found",
+    "noUsersMatch": "No users match \"{search}\"",
+    "noUsersCreated": "No users have been created yet.",
+    "page": "Page",
+    "of": "of",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for doesn't exist or has been moved.",
+    "backHome": "Back to Home"
   }
 }

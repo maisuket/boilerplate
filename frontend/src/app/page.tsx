@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
-// Este é um fallback físico. Na prática, o middleware.ts intercepta a rota '/'
-// antes de chegar aqui e já faz o redirecionamento baseado no idioma do navegador.
-export default function RootPage() {
-  redirect("/en");
+// Esta rota "catch-all" intercepta URLs inexistentes dentro do idioma (ex: /pt/financial)
+// e as direciona para o not-found.tsx local, sem quebrar o layout do Next.js!
+export default function CatchAllPage() {
+  notFound();
 }

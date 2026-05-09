@@ -64,8 +64,10 @@ function createAxiosInstance(): AxiosInstance {
 
         if (!refreshToken) {
           clearTokens();
-          if (typeof window !== "undefined" && window.location.pathname !== ROUTES.LOGIN) {
-            window.location.href = ROUTES.LOGIN;
+          if (typeof window !== "undefined" && !window.location.pathname.includes(ROUTES.LOGIN)) {
+            const segments = window.location.pathname.split("/");
+            const localePrefix = ["en", "pt"].includes(segments[1] || "") ? `/${segments[1]}` : "";
+            window.location.href = `${localePrefix}${ROUTES.LOGIN}`;
           }
           return Promise.reject(error);
         }
@@ -117,8 +119,12 @@ function createAxiosInstance(): AxiosInstance {
           const status = (refreshError as AxiosError).response?.status;
           if (status && status >= 400 && status < 500) {
             clearTokens();
-            if (typeof window !== "undefined" && window.location.pathname !== ROUTES.LOGIN) {
-              window.location.href = ROUTES.LOGIN;
+            if (typeof window !== "undefined" && !window.location.pathname.includes(ROUTES.LOGIN)) {
+              const segments = window.location.pathname.split("/");
+              const localePrefix = ["en", "pt"].includes(segments[1] || "")
+                ? `/${segments[1]}`
+                : "";
+              window.location.href = `${localePrefix}${ROUTES.LOGIN}`;
             }
           }
           return Promise.reject(refreshError);

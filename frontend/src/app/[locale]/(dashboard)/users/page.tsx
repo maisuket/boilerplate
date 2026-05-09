@@ -1,33 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  Search,
-  Filter,
-  MoreHorizontal,
-  Edit2,
-  Trash2,
-  Key,
-  ChevronLeft,
-  ChevronRight,
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-} from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TableCell } from "@/components/ui/table";
-import { DataTable, type ColumnDef } from "@/components/ui/data-table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DataTable } from "@/components/ui/data-table";
 import {
   Select,
   SelectContent,
@@ -43,15 +22,19 @@ import { EditUserDialog } from "@/components/forms/edit-user-dialog";
 import { DeleteUserDialog } from "@/components/dialogs/delete-user-dialog";
 import { ResetPasswordDialog } from "@/components/forms/reset-password-dialog";
 import { usePagination } from "@/hooks/use-pagination";
-import { formatDate } from "@/utils/format";
 import { useUsers } from "@/hooks/use-users";
 import { useUrlSync } from "@/hooks/use-url-sync";
 import type { User } from "@/types/user.types";
 import { USER_ROLES, type UserRole } from "@/constants/roles";
+import { useTranslations, useFormatter } from "next-intl";
+import { getColumns } from "./columns";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function UsersPage() {
+  const tTable = useTranslations("usersTable");
+  const t = useTranslations("usersPage");
+  const format = useFormatter();
   const {
     urlPage,
     changeUrlPage,
@@ -99,120 +82,27 @@ export default function UsersPage() {
     }
   }, [total, setTotal]);
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const renderSortableHeader = (label: string, column: string) => {
-    const isActive = getFilter("sortBy") === column;
-    const currentOrder = getFilter("sortOrder");
-
-    return (
-      <Button
-        variant="ghost"
-        size="sm"
-        className="-ml-3 h-8 data-[active=true]:text-foreground"
-        data-active={isActive}
-        onClick={() => toggleSort(column)}
-      >
-        <span>{label}</span>
-        {isActive && currentOrder === "asc" ? (
-          <ArrowUp className="ml-2 h-4 w-4" />
-        ) : isActive && currentOrder === "desc" ? (
-          <ArrowDown className="ml-2 h-4 w-4" />
-        ) : (
-          <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
-        )}
-      </Button>
-    );
-  };
-
-  const columns: ColumnDef<User>[] = [
-    {
-      header: renderSortableHeader("User", "name"),
-      cell: (user) => (
-        <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9">
-            <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
-            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="font-medium leading-none">{user.name}</p>
-            <p className="text-sm text-muted-foreground mt-0.5">{user.email}</p>
-          </div>
-        </div>
+  const columns = useMemo(
+    () =>
+      getColumns(
+        tTable,
+        format,
+        { getFilter, toggleSort },
+        {
+          onEdit: setUserToEdit,
+          onResetPassword: setUserToResetPassword,
+          onDelete: (user) => setUserToDelete(user.id),
+        }
       ),
-    },
-    {
-      header: renderSortableHeader("Role", "role"),
-      cell: (user) => (
-        <Badge variant={user.role?.toUpperCase() === "ADMIN" ? "default" : "secondary"}>
-          {user.role}
-        </Badge>
-      ),
-    },
-    {
-      header: renderSortableHeader("Status", "isActive"),
-      cell: (user) => (
-        <Badge variant={user.isActive ? "success" : "destructive"}>
-          {user.isActive ? "Active" : "Inactive"}
-        </Badge>
-      ),
-    },
-    {
-      header: renderSortableHeader("Joined", "createdAt"),
-      cellClassName: "text-muted-foreground",
-      cell: (user) => formatDate(user.createdAt),
-    },
-    {
-      header: "Actions",
-      headerClassName: "text-right",
-      cellClassName: "text-right",
-      cell: (user) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem className="cursor-pointer" onClick={() => setUserToEdit(user)}>
-              <Edit2 className="mr-2 h-4 w-4" />
-              <span>Edit</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => setUserToResetPassword(user)}
-            >
-              <Key className="mr-2 h-4 w-4" />
-              <span>Reset Password</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
-              onClick={() => setUserToDelete(user.id)}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              <span>Delete</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-    },
-  ];
+    [tTable, format, getFilter, toggleSort]
+  );
 
   return (
     <div className="flex flex-col flex-1 space-y-4 h-[calc(100dvh-7rem)]">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shrink-0">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
-          <p className="text-muted-foreground mt-1">Manage your application users</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("description")}</p>
         </div>
         <AddUserDialog />
       </div>
@@ -221,14 +111,16 @@ export default function UsersPage() {
         <CardHeader className="shrink-0">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <CardTitle>All Users</CardTitle>
-              <CardDescription>{isLoading ? "Loading..." : `${total} total users`}</CardDescription>
+              <CardTitle>{t("allUsers")}</CardTitle>
+              <CardDescription>
+                {isLoading ? t("loading") : t("totalUsers", { total })}
+              </CardDescription>
             </div>
             <div className="flex gap-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search users..."
+                  placeholder={t("searchPlaceholder")}
                   value={search}
                   onChange={(e) => {
                     setSearch(e.target.value);
@@ -242,12 +134,12 @@ export default function UsersPage() {
                 onValueChange={(val) => setFilter("status", val === "all" ? "" : val)}
               >
                 <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="All Status" />
+                  <SelectValue placeholder={t("allStatus")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="all">{t("allStatus")}</SelectItem>
+                  <SelectItem value="active">{t("active")}</SelectItem>
+                  <SelectItem value="inactive">{t("inactive")}</SelectItem>
                 </SelectContent>
               </Select>
               <Select
@@ -255,10 +147,10 @@ export default function UsersPage() {
                 onValueChange={(val) => setFilter("role", val === "all" ? "" : val)}
               >
                 <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="All Roles" />
+                  <SelectValue placeholder={t("allRoles")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Roles</SelectItem>
+                  <SelectItem value="all">{t("allRoles")}</SelectItem>
                   {USER_ROLES.map((role) => (
                     <SelectItem key={role} value={role}>
                       {role.charAt(0) + role.slice(1).toLowerCase()}
@@ -305,18 +197,18 @@ export default function UsersPage() {
               }
               errorState={
                 <EmptyState
-                  title="Failed to load users"
-                  description="There was an error loading the users list."
-                  action={{ label: "Try again", onClick: () => refetch() }}
+                  title={t("errorTitle")}
+                  description={t("errorDescription")}
+                  action={{ label: t("tryAgain"), onClick: () => refetch() }}
                 />
               }
               emptyState={
                 <EmptyState
-                  title="No users found"
+                  title={t("noUsersTitle")}
                   description={
                     debouncedSearch
-                      ? `No users match "${debouncedSearch}"`
-                      : "No users have been created yet."
+                      ? t("noUsersMatch", { search: debouncedSearch })
+                      : t("noUsersCreated")
                   }
                 />
               }
@@ -326,7 +218,7 @@ export default function UsersPage() {
           {!isLoading && totalPages > 0 && (
             <div className="flex items-center justify-between mt-4 shrink-0">
               <p className="text-sm text-muted-foreground">
-                Page <span className="font-medium text-foreground">{page}</span> of{" "}
+                {t("page")} <span className="font-medium text-foreground">{page}</span> {t("of")}{" "}
                 <span className="font-medium text-foreground">{totalPages}</span>
               </p>
               <div className="flex items-center gap-2">
@@ -337,7 +229,7 @@ export default function UsersPage() {
                   disabled={page <= 1 || isLoading}
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
-                  Previous
+                  {t("previous")}
                 </Button>
                 <Button
                   variant="outline"
@@ -345,7 +237,7 @@ export default function UsersPage() {
                   onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
                   disabled={page >= totalPages || isLoading}
                 >
-                  Next
+                  {t("next")}
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               </div>

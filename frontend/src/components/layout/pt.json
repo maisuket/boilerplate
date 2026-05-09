@@ -26,5 +26,65 @@
     "nameInvalidCharacters": "O nome só pode conter letras, espaços, hifens e apóstrofos",
     "confirmPasswordRequired": "Por favor, confirme sua senha",
     "invalidEmail": "Por favor, insira um endereço de email válido"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "projects": "Projetos",
+    "financial": "Financeiro",
+    "team": "Equipe",
+    "settings": "Configurações",
+    "mainMenu": "Menu Principal",
+    "otherMenu": "Outros",
+    "logout": "Sair"
+  },
+  "header": {
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema",
+    "notifications": "Notificações",
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "signOut": "Sair"
+  },
+  "usersTable": {
+    "name": "Nome",
+    "email": "Email",
+    "role": "Cargo",
+    "status": "Status",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "joined": "Entrou em",
+    "actions": "Ações",
+    "edit": "Editar",
+    "resetPassword": "Redefinir Senha",
+    "delete": "Excluir"
+  },
+  "usersPage": {
+    "title": "Usuários",
+    "description": "Gerencie os usuários da sua aplicação",
+    "allUsers": "Todos os Usuários",
+    "loading": "Carregando...",
+    "totalUsers": "{total} usuários no total",
+    "searchPlaceholder": "Buscar usuários...",
+    "allStatus": "Todos os Status",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "allRoles": "Todos os Cargos",
+    "errorTitle": "Falha ao carregar usuários",
+    "errorDescription": "Ocorreu um erro ao carregar a lista de usuários.",
+    "tryAgain": "Tentar novamente",
+    "noUsersTitle": "Nenhum usuário encontrado",
+    "noUsersMatch": "Nenhum usuário corresponde a \"{search}\"",
+    "noUsersCreated": "Nenhum usuário foi criado ainda.",
+    "page": "Página",
+    "of": "de",
+    "previous": "Anterior",
+    "next": "Próxima"
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "description": "A página que você está procurando não existe ou foi movida.",
+    "backHome": "Voltar para o Início"
   }
 }
