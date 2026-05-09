@@ -45,7 +45,10 @@
     "notifications": "Notificações",
     "profile": "Perfil",
     "settings": "Configurações",
-    "signOut": "Sair"
+    "signOut": "Sair",
+    "toggleMenu": "Alternar menu",
+    "toggleTheme": "Alternar tema",
+    "toggleLanguage": "Alternar idioma"
   },
   "usersTable": {
     "name": "Nome",
@@ -58,7 +61,8 @@
     "actions": "Ações",
     "edit": "Editar",
     "resetPassword": "Redefinir Senha",
-    "delete": "Excluir"
+    "delete": "Excluir",
+    "openMenu": "Abrir menu"
   },
   "usersPage": {
     "title": "Usuários",
@@ -86,5 +90,178 @@
     "title": "Página não encontrada",
     "description": "A página que você está procurando não existe ou foi movida.",
     "backHome": "Voltar para o Início"
+  },
+  "profileForm": {
+    "changeAvatar": "Alterar avatar",
+    "fullName": "Nome completo",
+    "namePlaceholder": "João Silva",
+    "emailAddress": "Endereço de email",
+    "emailPlaceholder": "voce@exemplo.com",
+    "avatarUrl": "URL do Avatar",
+    "avatarPlaceholder": "https://exemplo.com/avatar.jpg",
+    "saving": "Salvando...",
+    "saveChanges": "Salvar Alterações",
+    "discard": "Descartar",
+    "toastSuccessTitle": "Perfil atualizado",
+    "toastSuccessDescription": "Seu perfil foi salvo com sucesso.",
+    "toastErrorTitle": "Falha na atualização"
+  },
+  "settingsPage": {
+    "title": "Configurações",
+    "description": "Gerencie as configurações e preferências de segurança da sua conta.",
+    "tabs": {
+      "profile": "Perfil",
+      "security": "Segurança",
+      "legal": "Legal"
+    },
+    "profile": {
+      "title": "Informações do Perfil",
+      "description": "Atualize suas informações pessoais e como os outros veem você na plataforma."
+    },
+    "security": {
+      "title": "Segurança",
+      "description": "Atualize sua senha para manter sua conta segura."
+    },
+    "legal": {
+      "title": "Informações Legais",
+      "description": "Revise os termos e políticas da nossa plataforma.",
+      "termsTitle": "Termos de Serviço",
+      "termsDescription": "Leia nossos termos de serviço para entender seus direitos e responsabilidades.",
+      "viewTerms": "Ver Termos de Serviço"
+    },
+    "unsavedChanges": "Você tem alterações não salvas nesta aba. Se sair agora, todas as suas modificações serão perdidas permanentemente. Tem certeza de que deseja descartá-las?"
+  },
+  "changePasswordForm": {
+    "currentPassword": "Senha Atual",
+    "currentPasswordPlaceholder": "Digite a senha atual",
+    "newPassword": "Nova Senha",
+    "generateRandom": "Gerar senha aleatória",
+    "newPasswordPlaceholder": "Crie uma nova senha",
+    "confirmNewPassword": "Confirmar Nova Senha",
+    "confirmNewPasswordPlaceholder": "Confirme sua nova senha",
+    "updating": "Atualizando senha...",
+    "update": "Atualizar Senha",
+    "toastSuccessTitle": "Senha atualizada",
+    "toastSuccessDescription": "Sua senha foi alterada com sucesso.",
+    "toastErrorTitle": "Erro"
+  },
+  "dialogs": {
+    "unsavedChanges": {
+      "title": "Alterações não salvas",
+      "description": "Você tem alterações não salvas. Tem certeza de que deseja fechar este formulário? Todas as suas modificações serão perdidas.",
+      "keepEditing": "Continuar Editando",
+      "discardChanges": "Descartar Alterações"
+    },
+    "confirm": {
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "loading": "Carregando..."
+    },
+    "deleteUser": {
+      "title": "Tem certeza absoluta?",
+      "description": "Esta ação não pode ser desfeita. Isso excluirá permanentemente o usuário e removerá seus dados de nossos servidores.",
+      "confirm": "Excluir",
+      "loading": "Excluindo..."
+    }
+  },
+  "userMutations": {
+    "createSuccessTitle": "Usuário criado",
+    "createSuccessDescription": "O usuário foi criado com sucesso.",
+    "updateSuccessTitle": "Usuário atualizado",
+    "updateSuccessDescription": "O usuário foi atualizado com sucesso.",
+    "deleteSuccessTitle": "Usuário excluído",
+    "deleteSuccessDescription": "O usuário foi excluído com sucesso.",
+    "resetSuccessTitle": "Senha redefinida",
+    "resetSuccessDescription": "A senha do usuário foi atualizada com sucesso.",
+    "errorTitle": "Erro"
+  },
+  "loginForm": {
+    "emailAddress": "Endereço de email",
+    "emailPlaceholder": "voce@exemplo.com",
+    "password": "Senha",
+    "forgotPassword": "Esqueceu a senha?",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "Entrar",
+    "authenticating": "Autenticando com segurança...",
+    "redirecting": "Redirecionando...",
+    "toastSuccessTitle": "Bem-vindo de volta!",
+    "toastSuccessDescription": "Você entrou com sucesso.",
+    "toastErrorTitle": "Falha no login"
+  },
+  "registerForm": {
+    "fullName": "Nome completo",
+    "namePlaceholder": "João Silva",
+    "emailAddress": "Endereço de email",
+    "emailPlaceholder": "voce@exemplo.com",
+    "password": "Senha",
+    "generateRandom": "Gerar senha aleatória",
+    "passwordPlaceholder": "Pelo menos 8 caracteres",
+    "confirmPassword": "Confirmar senha",
+    "confirmPasswordPlaceholder": "Repita sua senha",
+    "createAccount": "Criar Conta",
+    "creatingAccount": "Criando conta...",
+    "termsAgreement": "Ao criar uma conta, você concorda com nossos",
+    "termsOfService": "Termos de Serviço",
+    "and": "e",
+    "privacyPolicy": "Política de Privacidade",
+    "toastSuccessTitle": "Conta criada!",
+    "toastSuccessDescription": "Bem-vindo! Sua conta foi criada com sucesso.",
+    "toastErrorTitle": "Falha no registro"
+  },
+  "addUser": {
+    "trigger": "Adicionar Usuário",
+    "title": "Adicionar Novo Usuário",
+    "description": "Crie uma nova conta de usuário. Eles poderão fazer login imediatamente.",
+    "name": "Nome",
+    "namePlaceholder": "João Silva",
+    "email": "Email",
+    "emailPlaceholder": "joao@exemplo.com",
+    "password": "Senha",
+    "generateRandom": "Gerar senha aleatória",
+    "passwordPlaceholder": "••••••••",
+    "role": "Cargo",
+    "cancel": "Cancelar",
+    "creating": "Criando...",
+    "submit": "Criar Usuário"
+  },
+  "editUser": {
+    "title": "Editar Usuário",
+    "description": "Atualize os detalhes e permissões do usuário.",
+    "name": "Nome",
+    "namePlaceholder": "João Silva",
+    "email": "Email",
+    "emailPlaceholder": "joao@exemplo.com",
+    "role": "Cargo",
+    "activeAccount": "Conta Ativa",
+    "cancel": "Cancelar",
+    "saving": "Salvando...",
+    "submit": "Salvar Alterações"
+  },
+  "resetPassword": {
+    "title": "Redefinir Senha",
+    "description": "Defina uma nova senha para",
+    "newPassword": "Nova Senha",
+    "generateRandom": "Gerar senha aleatória",
+    "passwordPlaceholder": "••••••••",
+    "confirmPassword": "Confirmar Nova Senha",
+    "cancel": "Cancelar",
+    "saving": "Salvando...",
+    "submit": "Redefinir Senha"
+  },
+  "passwordInput": {
+    "copy": "Copiar senha",
+    "hide": "Ocultar senha",
+    "show": "Mostrar senha"
+  },
+  "passwordStrength": {
+    "weak": "Fraca",
+    "fair": "Razoável",
+    "good": "Boa",
+    "strong": "Forte"
+  },
+  "roles": {
+    "USER": "Usuário",
+    "ADMIN": "Administrador",
+    "MODERATOR": "Moderador"
   }
 }

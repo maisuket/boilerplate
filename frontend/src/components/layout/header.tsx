@@ -65,7 +65,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={onMobileMenuToggle} className="lg:hidden">
           <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle menu</span>
+          <span className="sr-only">{t("toggleMenu")}</span>
         </Button>
       </div>
 
@@ -88,7 +88,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                     ) : (
                       <span className="h-4 w-4" />
                     )}
-                    <span className="sr-only">Toggle theme</span>
+                    <span className="sr-only">{t("toggleTheme")}</span>
                   </Button>
                 </DropdownMenuTrigger>
               </TooltipTrigger>
@@ -117,7 +117,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                     {notificationCount}
                   </Badge>
                 )}
-                <span className="sr-only">Notifications</span>
+                <span className="sr-only">{t("notifications")}</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>{t("notifications")}</TooltipContent>

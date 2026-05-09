@@ -51,6 +51,7 @@ export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps)
   const [showPassword, setShowPassword] = useState(false);
   const t = useTranslations("validation");
   const tMutations = useTranslations("userMutations");
+  const tDialog = useTranslations("resetPassword");
   const resetPasswordSchema = getResetPasswordSchema(t);
 
   const {
@@ -116,15 +117,15 @@ export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps)
         <DialogContent>
           <form onSubmit={handleSubmit(handleResetPassword)}>
             <DialogHeader>
-              <DialogTitle>Reset Password</DialogTitle>
+              <DialogTitle>{tDialog("title")}</DialogTitle>
               <DialogDescription>
-                Set a new password for <strong>{user?.name}</strong>.
+                {tDialog("description")} <strong>{user?.name}</strong>.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="new-password">New Password</Label>
+                  <Label htmlFor="new-password">{tDialog("newPassword")}</Label>
                   <button
                     type="button"
                     onClick={handleGeneratePassword}
@@ -132,12 +133,12 @@ export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps)
                     tabIndex={-1}
                     disabled={resetMutation.isPending}
                   >
-                    Generate random password
+                    {tDialog("generateRandom")}
                   </button>
                 </div>
                 <PasswordInput
                   id="new-password"
-                  placeholder="••••••••"
+                  placeholder={tDialog("passwordPlaceholder")}
                   error={!!errors.password}
                   disabled={resetMutation.isPending}
                   showCopy
@@ -152,10 +153,10 @@ export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps)
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <Label htmlFor="confirm-password">{tDialog("confirmPassword")}</Label>
                 <PasswordInput
                   id="confirm-password"
-                  placeholder="••••••••"
+                  placeholder={tDialog("passwordPlaceholder")}
                   error={!!errors.confirmPassword}
                   disabled={resetMutation.isPending}
                   {...register("confirmPassword")}
@@ -172,10 +173,10 @@ export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps)
                 onClick={() => handleOpenChange(false)}
                 disabled={resetMutation.isPending}
               >
-                Cancel
+                {tDialog("cancel")}
               </Button>
               <Button type="submit" loading={resetMutation.isPending} disabled={!isDirty}>
-                {resetMutation.isPending ? "Saving..." : "Reset Password"}
+                {resetMutation.isPending ? tDialog("saving") : tDialog("submit")}
               </Button>
             </DialogFooter>
           </form>

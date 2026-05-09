@@ -45,7 +45,10 @@
     "notifications": "Notifications",
     "profile": "Profile",
     "settings": "Settings",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "toggleMenu": "Toggle menu",
+    "toggleTheme": "Toggle theme",
+    "toggleLanguage": "Toggle language"
   },
   "usersTable": {
     "name": "Name",
@@ -58,7 +61,8 @@
     "actions": "Actions",
     "edit": "Edit",
     "resetPassword": "Reset Password",
-    "delete": "Delete"
+    "delete": "Delete",
+    "openMenu": "Open menu"
   },
   "usersPage": {
     "title": "Users",
@@ -86,5 +90,178 @@
     "title": "Page not found",
     "description": "The page you are looking for doesn't exist or has been moved.",
     "backHome": "Back to Home"
+  },
+  "profileForm": {
+    "changeAvatar": "Change avatar",
+    "fullName": "Full name",
+    "namePlaceholder": "John Doe",
+    "emailAddress": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "avatarUrl": "Avatar URL",
+    "avatarPlaceholder": "https://example.com/avatar.jpg",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "discard": "Discard",
+    "toastSuccessTitle": "Profile updated",
+    "toastSuccessDescription": "Your profile has been saved successfully.",
+    "toastErrorTitle": "Update failed"
+  },
+  "settingsPage": {
+    "title": "Settings",
+    "description": "Manage your account settings and security preferences.",
+    "tabs": {
+      "profile": "Profile",
+      "security": "Security",
+      "legal": "Legal"
+    },
+    "profile": {
+      "title": "Profile Information",
+      "description": "Update your personal information and how others see you on the platform."
+    },
+    "security": {
+      "title": "Security",
+      "description": "Update your password to keep your account secure."
+    },
+    "legal": {
+      "title": "Legal Information",
+      "description": "Review the terms and policies of our platform.",
+      "termsTitle": "Terms of Service",
+      "termsDescription": "Read our terms of service to understand your rights and responsibilities.",
+      "viewTerms": "View Terms of Service"
+    },
+    "unsavedChanges": "You have unsaved changes in this tab. If you leave now, all your modifications will be permanently lost. Are you sure you want to discard them?"
+  },
+  "changePasswordForm": {
+    "currentPassword": "Current Password",
+    "currentPasswordPlaceholder": "Enter current password",
+    "newPassword": "New Password",
+    "generateRandom": "Generate random password",
+    "newPasswordPlaceholder": "Create a new password",
+    "confirmNewPassword": "Confirm New Password",
+    "confirmNewPasswordPlaceholder": "Confirm your new password",
+    "updating": "Updating password...",
+    "update": "Update Password",
+    "toastSuccessTitle": "Password updated",
+    "toastSuccessDescription": "Your password has been changed successfully.",
+    "toastErrorTitle": "Error"
+  },
+  "dialogs": {
+    "unsavedChanges": {
+      "title": "Unsaved Changes",
+      "description": "You have unsaved changes. Are you sure you want to close this form? All your modifications will be lost.",
+      "keepEditing": "Keep Editing",
+      "discardChanges": "Discard Changes"
+    },
+    "confirm": {
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "loading": "Loading..."
+    },
+    "deleteUser": {
+      "title": "Are you absolutely sure?",
+      "description": "This action cannot be undone. This will permanently delete the user and remove their data from our servers.",
+      "confirm": "Delete",
+      "loading": "Deleting..."
+    }
+  },
+  "userMutations": {
+    "createSuccessTitle": "User created",
+    "createSuccessDescription": "The user has been successfully created.",
+    "updateSuccessTitle": "User updated",
+    "updateSuccessDescription": "The user has been successfully updated.",
+    "deleteSuccessTitle": "User deleted",
+    "deleteSuccessDescription": "The user has been successfully deleted.",
+    "resetSuccessTitle": "Password reset",
+    "resetSuccessDescription": "The user's password has been successfully updated.",
+    "errorTitle": "Error"
+  },
+  "loginForm": {
+    "emailAddress": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "Sign In",
+    "authenticating": "Authenticating securely...",
+    "redirecting": "Redirecting...",
+    "toastSuccessTitle": "Welcome back!",
+    "toastSuccessDescription": "You have been signed in successfully.",
+    "toastErrorTitle": "Sign in failed"
+  },
+  "registerForm": {
+    "fullName": "Full name",
+    "namePlaceholder": "John Doe",
+    "emailAddress": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "generateRandom": "Generate random password",
+    "passwordPlaceholder": "At least 8 characters",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordPlaceholder": "Repeat your password",
+    "createAccount": "Create Account",
+    "creatingAccount": "Creating account...",
+    "termsAgreement": "By creating an account, you agree to our",
+    "termsOfService": "Terms of Service",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "toastSuccessTitle": "Account created!",
+    "toastSuccessDescription": "Welcome! Your account has been created successfully.",
+    "toastErrorTitle": "Registration failed"
+  },
+  "addUser": {
+    "trigger": "Add User",
+    "title": "Add New User",
+    "description": "Create a new user account. They will be able to log in immediately.",
+    "name": "Name",
+    "namePlaceholder": "John Doe",
+    "email": "Email",
+    "emailPlaceholder": "john@example.com",
+    "password": "Password",
+    "generateRandom": "Generate random password",
+    "passwordPlaceholder": "••••••••",
+    "role": "Role",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "submit": "Create User"
+  },
+  "editUser": {
+    "title": "Edit User",
+    "description": "Update the user's details and permissions.",
+    "name": "Name",
+    "namePlaceholder": "John Doe",
+    "email": "Email",
+    "emailPlaceholder": "john@example.com",
+    "role": "Role",
+    "activeAccount": "Active Account",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "submit": "Save Changes"
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "description": "Set a new password for",
+    "newPassword": "New Password",
+    "generateRandom": "Generate random password",
+    "passwordPlaceholder": "••••••••",
+    "confirmPassword": "Confirm New Password",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "submit": "Reset Password"
+  },
+  "passwordInput": {
+    "copy": "Copy password",
+    "hide": "Hide password",
+    "show": "Show password"
+  },
+  "passwordStrength": {
+    "weak": "Weak",
+    "fair": "Fair",
+    "good": "Good",
+    "strong": "Strong"
+  },
+  "roles": {
+    "USER": "User",
+    "ADMIN": "Admin",
+    "MODERATOR": "Moderator"
   }
 }

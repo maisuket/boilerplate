@@ -22,6 +22,7 @@ export function LoginForm() {
   const router = useRouter();
   const toast = useToast();
   const tValidation = useTranslations("validation");
+  const t = useTranslations("loginForm");
 
   const {
     register,
@@ -38,13 +39,13 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data.email, data.password);
-      toast.success("Welcome back!", "You have been signed in successfully.");
+      toast.success(t("toastSuccessTitle"), t("toastSuccessDescription"));
       setIsRedirecting(true);
       setTimeout(() => {
         router.push(ROUTES.DASHBOARD);
       }, 500); // Aguarda a animação de fade-out terminar
     } catch (error) {
-      toast.error("Sign in failed", getErrorMessage(error));
+      toast.error(t("toastErrorTitle"), getErrorMessage(error));
     }
   };
 
@@ -57,11 +58,11 @@ export function LoginForm() {
       noValidate
     >
       <div className="space-y-2">
-        <Label htmlFor="email">Email address</Label>
+        <Label htmlFor="email">{t("emailAddress")}</Label>
         <Input
           id="email"
           type="email"
-          placeholder="you@example.com"
+          placeholder={t("emailPlaceholder")}
           autoComplete="email"
           error={!!errors.email}
           disabled={isSubmitting}
@@ -72,19 +73,19 @@ export function LoginForm() {
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t("password")}</Label>
           <button
             type="button"
             className="text-xs text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
             tabIndex={-1}
             disabled={isSubmitting}
           >
-            Forgot password?
+            {t("forgotPassword")}
           </button>
         </div>
         <PasswordInput
           id="password"
-          placeholder="••••••••"
+          placeholder={t("passwordPlaceholder")}
           autoComplete="current-password"
           error={!!errors.password}
           disabled={isSubmitting}
@@ -98,7 +99,7 @@ export function LoginForm() {
         className={`w-full transition-all duration-300 ${isSubmitting ? "bg-blue-600 text-white disabled:opacity-90 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-700" : ""}`}
         loading={isSubmitting}
       >
-        {isRedirecting ? "Redirecting..." : isLoading ? "Authenticating securely..." : "Sign In"}
+        {isRedirecting ? t("redirecting") : isLoading ? t("authenticating") : t("signIn")}
       </Button>
     </form>
   );

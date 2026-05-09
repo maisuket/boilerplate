@@ -2,6 +2,7 @@
 
 import { useState, forwardRef } from "react";
 import { Eye, EyeOff, Copy, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Input, type InputProps } from "@/components/ui/input";
 import { PasswordStrengthIndicator } from "./password-strength-indicator";
@@ -31,6 +32,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
   ) => {
     const [internalShowPassword, setInternalShowPassword] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
+    const t = useTranslations("passwordInput");
 
     // Suporta tanto o modo controlado (pelo pai) quanto não controlado (interno)
     const isControlled = controlledShowPassword !== undefined;
@@ -69,7 +71,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                 disabled={!passwordValue}
                 className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 tabIndex={-1}
-                title="Copy password"
+                title={t("copy")}
               >
                 {isCopied ? (
                   <Check className="h-4 w-4 text-emerald-500" />
@@ -83,7 +85,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
               onClick={togglePassword}
               className="text-muted-foreground hover:text-foreground transition-colors"
               tabIndex={-1}
-              title={showPassword ? "Hide password" : "Show password"}
+              title={showPassword ? t("hide") : t("show")}
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>

@@ -34,6 +34,7 @@ const ITEMS_PER_PAGE = 10;
 export default function UsersPage() {
   const tTable = useTranslations("usersTable");
   const t = useTranslations("usersPage");
+  const tRoles = useTranslations("roles");
   const format = useFormatter();
   const {
     urlPage,
@@ -87,6 +88,7 @@ export default function UsersPage() {
       getColumns(
         tTable,
         format,
+        tRoles,
         { getFilter, toggleSort },
         {
           onEdit: setUserToEdit,
@@ -94,7 +96,7 @@ export default function UsersPage() {
           onDelete: (user) => setUserToDelete(user.id),
         }
       ),
-    [tTable, format, getFilter, toggleSort]
+    [tTable, format, tRoles, getFilter, toggleSort]
   );
 
   return (
@@ -153,7 +155,7 @@ export default function UsersPage() {
                   <SelectItem value="all">{t("allRoles")}</SelectItem>
                   {USER_ROLES.map((role) => (
                     <SelectItem key={role} value={role}>
-                      {role.charAt(0) + role.slice(1).toLowerCase()}
+                      {tRoles(role as any)}
                     </SelectItem>
                   ))}
                 </SelectContent>

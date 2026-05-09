@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Languages } from "lucide-react";
 
@@ -20,6 +20,7 @@ export function LanguageSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const t = useTranslations("header");
 
   const switchLanguage = (newLocale: string) => {
     startTransition(() => {
@@ -36,7 +37,7 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-9 w-9 rounded-md" disabled={isPending}>
           <Languages className="h-5 w-5" />
-          <span className="sr-only">Toggle language</span>
+          <span className="sr-only">{t("toggleLanguage")}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

@@ -62,6 +62,7 @@ const renderSortableHeader = (label: string, column: string, sort: ColumnSort) =
 export const getColumns = (
   t: any,
   format: any,
+  tRoles: any,
   sort: ColumnSort,
   actions: ColumnActions
 ): ColumnDef<User>[] => [
@@ -87,7 +88,7 @@ export const getColumns = (
     cell: (user) => {
       return (
         <Badge variant={user.role?.toUpperCase() === "ADMIN" ? "default" : "secondary"}>
-          {user.role}
+          {user.role ? tRoles(user.role.toUpperCase() as any) : ""}
         </Badge>
       );
     },
@@ -121,7 +122,7 @@ export const getColumns = (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only">{t("openMenu")}</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

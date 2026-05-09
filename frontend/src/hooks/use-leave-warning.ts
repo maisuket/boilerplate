@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "@/components/layout/routing";
 
 export function useLeaveWarning(isDirty: boolean, onIntercept?: (proceed: () => void) => void) {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("dialogs.unsavedChanges");
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -34,11 +37,17 @@ export function useLeaveWarning(isDirty: boolean, onIntercept?: (proceed: () => 
           e.preventDefault();
           e.stopPropagation(); // Impede o Next.js <Link> de navegar
 
-          const proceed = () => router.push(url.pathname + url.search + url.hash);
+          // Remove o prefixo do idioma da URL para usar o router do next-intl corretamente
+          let targetPath = url.pathname;
+          const localePrefix = `/${locale}`;
+          if (targetPath.startsWith(`${localePrefix}/`) || targetPath === localePrefix) {
+            targetPath = targetPath.slice(localePrefix.length) || "/";
+          }
+
+          const proceed = () => router.push((targetPath + url.search + url.hash) as any);
 
           if (onIntercept) onIntercept(proceed);
-          else if (window.confirm("You have unsaved changes. Are you sure you want to leave?"))
-            proceed();
+          else if (window.confirm(t("description"))) proceed();
         }
       } catch (err) {
         // Ignora links inválidos
@@ -53,5 +62,5 @@ export function useLeaveWarning(isDirty: boolean, onIntercept?: (proceed: () => 
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("click", handleClick, { capture: true });
     };
-  }, [isDirty, onIntercept, router]);
+  }, [isDirty, onIntercept, router, locale, t]);
 }

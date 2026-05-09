@@ -23,6 +23,7 @@ export function RegisterForm() {
   const router = useRouter();
   const toast = useToast();
   const tValidation = useTranslations("validation");
+  const t = useTranslations("registerForm");
 
   const {
     register,
@@ -45,10 +46,10 @@ export function RegisterForm() {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       await registerUser(data.name, data.email, data.password);
-      toast.success("Account created!", "Welcome! Your account has been created successfully.");
+      toast.success(t("toastSuccessTitle"), t("toastSuccessDescription"));
       router.push(ROUTES.DASHBOARD);
     } catch (error) {
-      toast.error("Registration failed", getErrorMessage(error));
+      toast.error(t("toastErrorTitle"), getErrorMessage(error));
     }
   };
 
@@ -63,11 +64,11 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="space-y-2">
-        <Label htmlFor="name">Full name</Label>
+        <Label htmlFor="name">{t("fullName")}</Label>
         <Input
           id="name"
           type="text"
-          placeholder="John Doe"
+          placeholder={t("namePlaceholder")}
           autoComplete="name"
           error={!!errors.name}
           disabled={isLoading}
@@ -77,11 +78,11 @@ export function RegisterForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email address</Label>
+        <Label htmlFor="email">{t("emailAddress")}</Label>
         <Input
           id="email"
           type="email"
-          placeholder="you@example.com"
+          placeholder={t("emailPlaceholder")}
           autoComplete="email"
           error={!!errors.email}
           disabled={isLoading}
@@ -92,7 +93,7 @@ export function RegisterForm() {
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t("password")}</Label>
           <button
             type="button"
             onClick={handleGeneratePassword}
@@ -100,12 +101,12 @@ export function RegisterForm() {
             tabIndex={-1}
             disabled={isLoading}
           >
-            Generate random password
+            {t("generateRandom")}
           </button>
         </div>
         <PasswordInput
           id="password"
-          placeholder="At least 8 characters"
+          placeholder={t("passwordPlaceholder")}
           autoComplete="new-password"
           error={!!errors.password}
           disabled={isLoading}
@@ -120,10 +121,10 @@ export function RegisterForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirm password</Label>
+        <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
         <PasswordInput
           id="confirmPassword"
-          placeholder="Repeat your password"
+          placeholder={t("confirmPasswordPlaceholder")}
           autoComplete="new-password"
           error={!!errors.confirmPassword}
           disabled={isLoading}
@@ -135,17 +136,17 @@ export function RegisterForm() {
       </div>
 
       <Button type="submit" className="w-full" loading={isLoading}>
-        {isLoading ? "Creating account..." : "Create Account"}
+        {isLoading ? t("creatingAccount") : t("createAccount")}
       </Button>
 
       <p className="text-center text-xs text-muted-foreground">
-        By creating an account, you agree to our{" "}
+        {t("termsAgreement")}{" "}
         <a href="#" className="text-primary hover:underline">
-          Terms of Service
+          {t("termsOfService")}
         </a>{" "}
-        and{" "}
+        {t("and")}{" "}
         <a href="#" className="text-primary hover:underline">
-          Privacy Policy
+          {t("privacyPolicy")}
         </a>
       </p>
     </form>

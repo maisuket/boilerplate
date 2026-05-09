@@ -30,6 +30,8 @@ interface EditUserDialogProps {
 
 export function EditUserDialog({ user, onClose }: EditUserDialogProps) {
   const tValidation = useTranslations("validation");
+  const t = useTranslations("editUser");
+  const tRoles = useTranslations("roles");
 
   const {
     register,
@@ -90,15 +92,15 @@ export function EditUserDialog({ user, onClose }: EditUserDialogProps) {
         <DialogContent>
           <form onSubmit={handleSubmit(handleEditUser)}>
             <DialogHeader>
-              <DialogTitle>Edit User</DialogTitle>
-              <DialogDescription>Update the user's details and permissions.</DialogDescription>
+              <DialogTitle>{t("title")}</DialogTitle>
+              <DialogDescription>{t("description")}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-name">Name</Label>
+                <Label htmlFor="edit-name">{t("name")}</Label>
                 <Input
                   id="edit-name"
-                  placeholder="John Doe"
+                  placeholder={t("namePlaceholder")}
                   error={!!errors.name}
                   disabled={updateMutation.isPending}
                   {...register("name")}
@@ -106,11 +108,11 @@ export function EditUserDialog({ user, onClose }: EditUserDialogProps) {
                 {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-email">Email</Label>
+                <Label htmlFor="edit-email">{t("email")}</Label>
                 <Input
                   id="edit-email"
                   type="email"
-                  placeholder="john@example.com"
+                  placeholder={t("emailPlaceholder")}
                   error={!!errors.email}
                   disabled={updateMutation.isPending}
                   {...register("email")}
@@ -118,7 +120,7 @@ export function EditUserDialog({ user, onClose }: EditUserDialogProps) {
                 {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-role">Role</Label>
+                <Label htmlFor="edit-role">{t("role")}</Label>
                 <select
                   id="edit-role"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -127,7 +129,7 @@ export function EditUserDialog({ user, onClose }: EditUserDialogProps) {
                 >
                   {USER_ROLES.map((role) => (
                     <option key={role} value={role}>
-                      {role.charAt(0) + role.slice(1).toLowerCase()}
+                      {tRoles(role as any)}
                     </option>
                   ))}
                 </select>
@@ -141,7 +143,7 @@ export function EditUserDialog({ user, onClose }: EditUserDialogProps) {
                   disabled={updateMutation.isPending}
                   {...register("isActive")}
                 />
-                <Label htmlFor="edit-isActive">Active Account</Label>
+                <Label htmlFor="edit-isActive">{t("activeAccount")}</Label>
                 {errors.isActive && (
                   <p className="text-sm text-destructive">{errors.isActive.message}</p>
                 )}
@@ -154,10 +156,10 @@ export function EditUserDialog({ user, onClose }: EditUserDialogProps) {
                 onClick={() => handleOpenChange(false)}
                 disabled={updateMutation.isPending}
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button type="submit" loading={updateMutation.isPending} disabled={!isDirty}>
-                {updateMutation.isPending ? "Saving..." : "Save Changes"}
+                {updateMutation.isPending ? t("saving") : t("submit")}
               </Button>
             </DialogFooter>
           </form>
