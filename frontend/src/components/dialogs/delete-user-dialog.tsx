@@ -1,16 +1,7 @@
 "use client";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { useDeleteUser } from "@/hooks/use-user-mutations";
+import { ConfirmDialog } from "@/components/dialogs/confirm-dialog";
 
 interface DeleteUserDialogProps {
   userId: string | null;
@@ -32,26 +23,16 @@ export function DeleteUserDialog({ userId, onClose }: DeleteUserDialogProps) {
   };
 
   return (
-    <AlertDialog open={!!userId} onOpenChange={(open) => !open && onClose()}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the user and remove their
-            data from our servers.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleDelete}
-            loading={deleteMutation.isPending}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-          >
-            {deleteMutation.isPending ? "Deleting..." : "Delete"}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmDialog
+      open={!!userId}
+      onOpenChange={(open) => !open && onClose()}
+      title="Are you absolutely sure?"
+      description="This action cannot be undone. This will permanently delete the user and remove their data from our servers."
+      confirmText="Delete"
+      loadingText="Deleting..."
+      onConfirm={handleDelete}
+      isPending={deleteMutation.isPending}
+      variant="destructive"
+    />
   );
 }

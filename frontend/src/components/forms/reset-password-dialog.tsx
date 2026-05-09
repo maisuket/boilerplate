@@ -20,6 +20,8 @@ import type { User } from "@/types/user.types";
 import { PasswordInput } from "./password-input";
 import { useUpdateUser } from "@/hooks/use-user-mutations";
 import { generateRandomPassword } from "@/utils/password";
+import { useModalWarning } from "@/hooks/use-modal-warning";
+import { UnsavedChangesDialog } from "@/components/dialogs/unsaved-changes-dialog";
 
 const resetPasswordSchema = z
   .object({
@@ -78,11 +80,20 @@ export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps)
     resetMutation.mutate({ id: user!.id, data: { password: data.password } });
   };
 
+  const closeDialog = () => {
+    reset();
+    setShowPassword(false);
+    onClose();
+  };
+
+  const { showWarning, setShowWarning, checkWarning, handleConfirmClose } = useModalWarning(
+    isDirty,
+    closeDialog
+  );
+
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      reset();
-      setShowPassword(false);
-      onClose();
+      checkWarning();
     }
   };
 
@@ -95,74 +106,82 @@ export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps)
   };
 
   return (
-    <Dialog open={!!user} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <form onSubmit={handleSubmit(handleResetPassword)}>
-          <DialogHeader>
-            <DialogTitle>Reset Password</DialogTitle>
-            <DialogDescription>
-              Set a new password for <strong>{user?.name}</strong>.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="new-password">New Password</Label>
-                <button
-                  type="button"
-                  onClick={handleGeneratePassword}
-                  className="text-xs text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                  tabIndex={-1}
+    <>
+      <Dialog open={!!user} onOpenChange={handleOpenChange}>
+        <DialogContent>
+          <form onSubmit={handleSubmit(handleResetPassword)}>
+            <DialogHeader>
+              <DialogTitle>Reset Password</DialogTitle>
+              <DialogDescription>
+                Set a new password for <strong>{user?.name}</strong>.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="new-password">New Password</Label>
+                  <button
+                    type="button"
+                    onClick={handleGeneratePassword}
+                    className="text-xs text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                    tabIndex={-1}
+                    disabled={resetMutation.isPending}
+                  >
+                    Generate random password
+                  </button>
+                </div>
+                <PasswordInput
+                  id="new-password"
+                  placeholder="••••••••"
+                  error={!!errors.password}
                   disabled={resetMutation.isPending}
-                >
-                  Generate random password
-                </button>
+                  showCopy
+                  passwordValue={password}
+                  showPassword={showPassword}
+                  onShowPasswordChange={setShowPassword}
+                  showStrengthIndicator
+                  {...register("password")}
+                />
+                {errors.password && (
+                  <p className="text-sm text-destructive">{errors.password.message}</p>
+                )}
               </div>
-              <PasswordInput
-                id="new-password"
-                placeholder="••••••••"
-                error={!!errors.password}
-                disabled={resetMutation.isPending}
-                showCopy
-                passwordValue={password}
-                showPassword={showPassword}
-                onShowPasswordChange={setShowPassword}
-                showStrengthIndicator
-                {...register("password")}
-              />
-              {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
-              )}
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <PasswordInput
+                  id="confirm-password"
+                  placeholder="••••••••"
+                  error={!!errors.confirmPassword}
+                  disabled={resetMutation.isPending}
+                  {...register("confirmPassword")}
+                />
+                {errors.confirmPassword && (
+                  <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+                )}
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm New Password</Label>
-              <PasswordInput
-                id="confirm-password"
-                placeholder="••••••••"
-                error={!!errors.confirmPassword}
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleOpenChange(false)}
                 disabled={resetMutation.isPending}
-                {...register("confirmPassword")}
-              />
-              {errors.confirmPassword && (
-                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-              )}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={resetMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" loading={resetMutation.isPending} disabled={!isDirty}>
-              {resetMutation.isPending ? "Saving..." : "Reset Password"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+              >
+                Cancel
+              </Button>
+              <Button type="submit" loading={resetMutation.isPending} disabled={!isDirty}>
+                {resetMutation.isPending ? "Saving..." : "Reset Password"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <UnsavedChangesDialog
+        open={showWarning}
+        onOpenChange={setShowWarning}
+        onConfirm={handleConfirmClose}
+      />
+    </>
   );
 }

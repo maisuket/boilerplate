@@ -7,17 +7,8 @@ import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsSync } from "@/components/ui/tabs-sync";
 import { ProfileForm } from "@/components/forms/profile-form";
 import { ChangePasswordForm } from "@/components/forms/change-password-form";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { useLeaveWarning } from "@/hooks/use-leave-warning";
+import { UnsavedChangesDialog } from "@/components/dialogs/unsaved-changes-dialog";
 
 export default function SettingsPage() {
   const [isDirty, setIsDirty] = useState(false);
@@ -107,29 +98,12 @@ export default function SettingsPage() {
         </TabsContent>
       </TabsSync>
 
-      <AlertDialog
+      <UnsavedChangesDialog
         open={!!pendingProceed}
         onOpenChange={(open) => !open && setPendingProceed(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
-            <AlertDialogDescription>
-              You have unsaved changes in this tab. If you leave now, all your modifications will be
-              permanently lost. Are you sure you want to discard them?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Keep Editing</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmTabChange}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Discard Changes
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onConfirm={confirmTabChange}
+        description="You have unsaved changes in this tab. If you leave now, all your modifications will be permanently lost. Are you sure you want to discard them?"
+      />
     </div>
   );
 }
