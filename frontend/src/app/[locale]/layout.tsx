@@ -7,7 +7,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { APP_DESCRIPTION, APP_NAME } from "@/constants/app";
 
-import "./globals.css";
+import "../globals.css";
 import { cn } from "@/lib/utils";
 import { ProgressProvider } from "@/providers/progress-provider";
 import { CookieConsent } from "@/components/layout/cookie-consent";

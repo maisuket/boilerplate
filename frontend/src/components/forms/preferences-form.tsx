@@ -20,6 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function PreferencesForm() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [colorTheme, setColorTheme] = useState("zinc");
   const [isPending, startTransition] = useTransition();
   const locale = useLocale();
   const router = useRouter();
@@ -29,7 +30,18 @@ export function PreferencesForm() {
 
   useEffect(() => {
     setMounted(true);
+
+    // Carrega a paleta salva anteriormente
+    const savedColor = localStorage.getItem("color-theme") || "zinc";
+    setColorTheme(savedColor);
+    document.documentElement.setAttribute("data-theme", savedColor);
   }, []);
+
+  const handleColorChange = (value: string) => {
+    setColorTheme(value);
+    localStorage.setItem("color-theme", value);
+    document.documentElement.setAttribute("data-theme", value);
+  };
 
   const switchLanguage = (newLocale: string) => {
     startTransition(() => {
@@ -74,6 +86,52 @@ export function PreferencesForm() {
             </Select>
           )}
           <p className="text-sm text-muted-foreground">{t("themeDescription")}</p>
+        </div>
+
+        <div className="space-y-2">
+          <Label>{t("colorPalette")}</Label>
+          {!mounted ? (
+            <Skeleton className="h-10 w-full" />
+          ) : (
+            <Select value={colorTheme} onValueChange={handleColorChange}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("selectColorPalette")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="zinc">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 rounded-full bg-zinc-500" />
+                    <span>{t("palettes.zinc")}</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="rose">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 rounded-full bg-rose-500" />
+                    <span>{t("palettes.rose")}</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="blue">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 rounded-full bg-blue-500" />
+                    <span>{t("palettes.blue")}</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="green">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 rounded-full bg-green-500" />
+                    <span>{t("palettes.green")}</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="orange">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 rounded-full bg-orange-500" />
+                    <span>{t("palettes.orange")}</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+          <p className="text-sm text-muted-foreground">{t("paletteDescription")}</p>
         </div>
 
         <div className="space-y-2">

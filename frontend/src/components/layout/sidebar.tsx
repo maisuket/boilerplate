@@ -64,7 +64,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
           )}
         >
           <Link href={ROUTES.DASHBOARD} className="flex items-center overflow-hidden">
-            <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 bg-[hsl(var(--sidebar-primary))] rounded-lg flex items-center justify-center shrink-0">
               <span className="font-bold text-white">{collapsed ? "V" : "Z"}</span>
             </div>
             <AnimatePresence>
@@ -101,7 +101,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
                     initial={{ opacity: 0, height: 0, marginBottom: 0 }}
                     animate={{ opacity: 1, height: "auto", marginBottom: 12 }}
                     exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                    className="text-xs font-semibold text-emerald-400/60 uppercase tracking-wider px-2 whitespace-nowrap overflow-hidden"
+                    className="text-xs font-semibold text-[hsl(var(--sidebar-primary))/0.6] uppercase tracking-wider px-2 whitespace-nowrap overflow-hidden"
                   >
                     {t("mainMenu")}
                   </motion.h3>
@@ -117,7 +117,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
                       className={cn(
                         "flex items-center px-3 py-2.5 rounded-lg transition-colors overflow-hidden",
                         isActive
-                          ? "bg-emerald-500/10 text-emerald-400"
+                          ? "bg-[hsl(var(--sidebar-primary))/0.15] text-[hsl(var(--sidebar-primary))]"
                           : "text-gray-400 hover:text-white hover:bg-white/5",
                         collapsed ? "justify-center px-2" : ""
                       )}
@@ -160,7 +160,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
                     initial={{ opacity: 0, height: 0, marginBottom: 0 }}
                     animate={{ opacity: 1, height: "auto", marginBottom: 12 }}
                     exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                    className="text-xs font-semibold text-emerald-400/60 uppercase tracking-wider px-2 whitespace-nowrap overflow-hidden"
+                    className="text-xs font-semibold text-[hsl(var(--sidebar-primary))/0.6] uppercase tracking-wider px-2 whitespace-nowrap overflow-hidden"
                   >
                     {t("otherMenu")}
                   </motion.h3>
@@ -176,7 +176,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
                       className={cn(
                         "flex items-center px-3 py-2.5 rounded-lg transition-colors overflow-hidden",
                         isActive
-                          ? "bg-emerald-500/10 text-emerald-400"
+                          ? "bg-[hsl(var(--sidebar-primary))/0.15] text-[hsl(var(--sidebar-primary))]"
                           : "text-gray-400 hover:text-white hover:bg-white/5",
                         collapsed ? "justify-center px-2" : ""
                       )}
@@ -224,7 +224,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
                   collapsed ? "justify-center" : ""
                 )}
               >
-                <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-sm font-bold text-white shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[hsl(var(--sidebar-primary))] flex items-center justify-center text-sm font-bold text-white shrink-0">
                   {getInitials(user?.name)}
                 </div>
                 <AnimatePresence>
