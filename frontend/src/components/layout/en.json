@@ -38,17 +38,10 @@
     "logout": "Logout"
   },
   "header": {
-    "theme": "Theme",
-    "light": "Light",
-    "dark": "Dark",
-    "system": "System",
     "notifications": "Notifications",
     "profile": "Profile",
     "settings": "Settings",
-    "signOut": "Sign out",
-    "toggleMenu": "Toggle menu",
-    "toggleTheme": "Toggle theme",
-    "toggleLanguage": "Toggle language"
+    "signOut": "Sign out"
   },
   "usersTable": {
     "name": "Name",
@@ -61,8 +54,7 @@
     "actions": "Actions",
     "edit": "Edit",
     "resetPassword": "Reset Password",
-    "delete": "Delete",
-    "openMenu": "Open menu"
+    "delete": "Delete"
   },
   "usersPage": {
     "title": "Users",
@@ -112,7 +104,8 @@
     "tabs": {
       "profile": "Profile",
       "security": "Security",
-      "legal": "Legal"
+      "legal": "Legal",
+      "preferences": "Preferences"
     },
     "profile": {
       "title": "Profile Information",
@@ -128,6 +121,10 @@
       "termsTitle": "Terms of Service",
       "termsDescription": "Read our terms of service to understand your rights and responsibilities.",
       "viewTerms": "View Terms of Service"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "description": "Manage your theme, language and regional settings."
     },
     "unsavedChanges": "You have unsaved changes in this tab. If you leave now, all your modifications will be permanently lost. Are you sure you want to discard them?"
   },
@@ -263,5 +260,16 @@
     "USER": "User",
     "ADMIN": "Admin",
     "MODERATOR": "Moderator"
+  },
+  "preferencesForm": {
+    "theme": "Theme",
+    "selectTheme": "Select theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "themeDescription": "Customize how the interface looks on your device.",
+    "language": "Language",
+    "selectLanguage": "Select language",
+    "languageDescription": "Select your preferred language for the interface."
   }
 }

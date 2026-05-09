@@ -8,6 +8,7 @@ import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsSync } from "@/components/ui/tabs-sync";
 import { ProfileForm } from "@/components/forms/profile-form";
 import { ChangePasswordForm } from "@/components/forms/change-password-form";
+import { PreferencesForm } from "@/components/forms/preferences-form";
 import { useLeaveWarning } from "@/hooks/use-leave-warning";
 import { UnsavedChangesDialog } from "@/components/dialogs/unsaved-changes-dialog";
 import { TermsOfServiceDialog } from "@/components/dialogs/terms-of-service-dialog";
@@ -61,6 +62,12 @@ export default function SettingsPage() {
             {t("tabs.profile")}
           </TabsTrigger>
           <TabsTrigger
+            value="preferences"
+            className="relative rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+          >
+            {t("tabs.preferences")}
+          </TabsTrigger>
+          <TabsTrigger
             value="security"
             className="relative rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
           >
@@ -85,6 +92,21 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
               <ProfileForm onDirtyChange={setIsDirty} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent
+          value="preferences"
+          className="space-y-6 focus-visible:outline-none focus-visible:ring-0"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("preferences.title")}</CardTitle>
+              <CardDescription>{t("preferences.description")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PreferencesForm />
             </CardContent>
           </Card>
         </TabsContent>

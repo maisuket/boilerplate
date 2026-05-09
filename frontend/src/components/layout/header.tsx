@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "@/components/layout/routing";
-import { Menu, Bell, Sun, Moon, Monitor, LogOut, User, Settings, ChevronDown } from "lucide-react";
-import { useTheme } from "next-themes";
-import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { Menu, Bell, LogOut, User, Settings, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -28,7 +26,6 @@ interface HeaderProps {
 }
 
 export function Header({ onMobileMenuToggle }: HeaderProps) {
-  const { theme, setTheme } = useTheme();
   const { user, logout } = useAuth();
   const router = useRouter();
   const [notificationCount] = useState(3);
@@ -38,12 +35,6 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const themeOptions = [
-    { value: "light", label: t("light"), icon: Sun },
-    { value: "dark", label: t("dark"), icon: Moon },
-    { value: "system", label: t("system"), icon: Monitor },
-  ];
 
   const getInitials = (name?: string) => {
     if (!name) return "U";
@@ -70,42 +61,6 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        {/* Theme Toggle */}
-        <DropdownMenu>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-9 w-9">
-                    {mounted ? (
-                      theme === "light" ? (
-                        <Sun className="h-4 w-4" />
-                      ) : theme === "dark" ? (
-                        <Moon className="h-4 w-4" />
-                      ) : (
-                        <Monitor className="h-4 w-4" />
-                      )
-                    ) : (
-                      <span className="h-4 w-4" />
-                    )}
-                    <span className="sr-only">{t("toggleTheme")}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-              </TooltipTrigger>
-              <TooltipContent>{t("theme")}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <DropdownMenuContent align="end">
-            {themeOptions.map(({ value, label, icon: Icon }) => (
-              <DropdownMenuItem key={value} onClick={() => setTheme(value)} className="gap-2">
-                <Icon className="h-4 w-4" />
-                {label}
-                {theme === value && <span className="ml-auto text-xs text-primary">✓</span>}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <LanguageSwitcher />
         {/* Notifications */}
         <TooltipProvider>
           <Tooltip>

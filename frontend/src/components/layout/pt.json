@@ -38,17 +38,10 @@
     "logout": "Sair"
   },
   "header": {
-    "theme": "Tema",
-    "light": "Claro",
-    "dark": "Escuro",
-    "system": "Sistema",
     "notifications": "Notificações",
     "profile": "Perfil",
     "settings": "Configurações",
-    "signOut": "Sair",
-    "toggleMenu": "Alternar menu",
-    "toggleTheme": "Alternar tema",
-    "toggleLanguage": "Alternar idioma"
+    "signOut": "Sair"
   },
   "usersTable": {
     "name": "Nome",
@@ -61,8 +54,7 @@
     "actions": "Ações",
     "edit": "Editar",
     "resetPassword": "Redefinir Senha",
-    "delete": "Excluir",
-    "openMenu": "Abrir menu"
+    "delete": "Excluir"
   },
   "usersPage": {
     "title": "Usuários",
@@ -112,7 +104,8 @@
     "tabs": {
       "profile": "Perfil",
       "security": "Segurança",
-      "legal": "Legal"
+      "legal": "Legal",
+      "preferences": "Preferências"
     },
     "profile": {
       "title": "Informações do Perfil",
@@ -128,6 +121,10 @@
       "termsTitle": "Termos de Serviço",
       "termsDescription": "Leia nossos termos de serviço para entender seus direitos e responsabilidades.",
       "viewTerms": "Ver Termos de Serviço"
+    },
+    "preferences": {
+      "title": "Preferências",
+      "description": "Gerencie seu tema, idioma e configurações regionais."
     },
     "unsavedChanges": "Você tem alterações não salvas nesta aba. Se sair agora, todas as suas modificações serão perdidas permanentemente. Tem certeza de que deseja descartá-las?"
   },
@@ -263,5 +260,16 @@
     "USER": "Usuário",
     "ADMIN": "Administrador",
     "MODERATOR": "Moderador"
+  },
+  "preferencesForm": {
+    "theme": "Tema",
+    "selectTheme": "Selecione o tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema",
+    "themeDescription": "Personalize a aparência da interface no seu dispositivo.",
+    "language": "Idioma",
+    "selectLanguage": "Selecione o idioma",
+    "languageDescription": "Selecione o seu idioma preferido para a interface."
   }
 }
