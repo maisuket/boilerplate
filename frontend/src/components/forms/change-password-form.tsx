@@ -11,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { changePasswordSchema, type ChangePasswordFormData } from "@/schemas/auth.schema";
 import { PasswordInput } from "./password-input";
 import { getErrorMessage } from "@/utils/error";
+import { usersService } from "@/services/users.service";
+import { generateRandomPassword } from "@/utils/password";
 
 export function ChangePasswordForm() {
   const toast = useToast();
@@ -23,6 +25,7 @@ export function ChangePasswordForm() {
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors, isDirty },
   } = useForm<ChangePasswordFormData>({
     resolver: zodResolver(changePasswordSchema),
@@ -36,11 +39,7 @@ export function ChangePasswordForm() {
   const newPasswordValue = watch("newPassword");
 
   const passwordMutation = useMutation({
-    // NOTA: Substitua essa mutation pela chamada real da sua API quando o endpoint de "Change Password" estiver criado no backend.
-    // Ex: mutationFn: (data: ChangePasswordFormData) => authService.changePassword(data),
-    mutationFn: async (data: ChangePasswordFormData) => {
-      return new Promise((resolve) => setTimeout(resolve, 1000));
-    },
+    mutationFn: (data: ChangePasswordFormData) => usersService.changePassword(data),
     onSuccess: () => {
       toast.success("Password updated", "Your password has been changed successfully.");
       reset();
@@ -52,6 +51,14 @@ export function ChangePasswordForm() {
 
   const onSubmit = (data: ChangePasswordFormData) => {
     passwordMutation.mutate(data);
+  };
+
+  const handleGeneratePassword = () => {
+    const generated = generateRandomPassword();
+
+    setValue("newPassword", generated, { shouldValidate: true, shouldDirty: true });
+    setValue("confirmNewPassword", generated, { shouldValidate: true, shouldDirty: true });
+    setShowNewPassword(true);
   };
 
   return (
@@ -73,12 +80,24 @@ export function ChangePasswordForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="newPassword">New Password</Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="newPassword">New Password</Label>
+          <button
+            type="button"
+            onClick={handleGeneratePassword}
+            className="text-xs text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+            tabIndex={-1}
+            disabled={passwordMutation.isPending}
+          >
+            Generate random password
+          </button>
+        </div>
         <PasswordInput
           id="newPassword"
           placeholder="Create a new password"
           error={!!errors.newPassword}
           disabled={passwordMutation.isPending}
+          showCopy
           passwordValue={newPasswordValue}
           showPassword={showNewPassword}
           onShowPasswordChange={setShowNewPassword}

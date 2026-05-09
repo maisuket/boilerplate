@@ -3,12 +3,14 @@ import {
   NotFoundException,
   ConflictException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { FindAllUsersDto } from './dto/find-all-users.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { PaginatedResult } from '../../shared/interfaces/pagination.interface';
 import {
   buildPaginationParams,
@@ -17,6 +19,7 @@ import {
 } from '../../shared/utils/pagination.util';
 import { hashPassword } from '../../shared/utils/hash.util';
 import { Role, Prisma } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -190,5 +193,26 @@ export class UsersService {
     });
 
     return new UserResponseDto(updated);
+  }
+
+  async changePassword(id: string, dto: ChangePasswordDto): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID '${id}' not found`);
+    }
+
+    const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.password);
+
+    if (!isPasswordValid) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    const hashedPassword = await hashPassword(dto.newPassword);
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { password: hashedPassword },
+    });
   }
 }

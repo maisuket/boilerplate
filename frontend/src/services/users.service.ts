@@ -6,6 +6,7 @@ import type {
   ListQueryParams,
   PaginationMeta,
 } from "@/types/api.types";
+import { ChangePasswordFormData } from "@/schemas/auth.schema";
 
 export const usersService = {
   getUsers: async (params?: ListQueryParams): Promise<PaginatedResponse<User>> => {
@@ -32,6 +33,14 @@ export const usersService = {
     return data.data;
   },
 
+  // Adicione isto no seu arquivo users.service.ts (Frontend)
+  async changePassword(data: ChangePasswordFormData) {
+    const response = await apiClient.patch("/users/change-password", {
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+    });
+    return response.data;
+  },
   deleteUser: async (id: string): Promise<void> => {
     // Delete (NO_CONTENT) geralmente não retorna payload, mas desestruturamos por segurança
     const { data } = await apiClient.delete<ApiResponse<void>>(`/users/${id}`);

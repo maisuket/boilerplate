@@ -19,6 +19,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { FindAllUsersDto } from './dto/find-all-users.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../../shared/guards/jwt-auth.guard';
 import { RolesGuard } from '../../shared/guards/roles.guard';
 import { Roles } from '../../shared/decorators/roles.decorator';
@@ -50,6 +51,17 @@ export class UsersController {
   @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
   async findAll(@Query() query: FindAllUsersDto) {
     return this.usersService.findAll(query);
+  }
+
+  @Patch('change-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Change current user password' })
+  @ApiResponse({ status: 200, description: 'Password successfully updated' })
+  async changePassword(
+    @CurrentUser() currentUser: any,
+    @Body() dto: ChangePasswordDto,
+  ): Promise<void> {
+    return this.usersService.changePassword(currentUser.id, dto);
   }
 
   @Get(':id')
