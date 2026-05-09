@@ -41,7 +41,8 @@
     "notifications": "Notificações",
     "profile": "Perfil",
     "settings": "Configurações",
-    "signOut": "Sair"
+    "signOut": "Sair",
+    "toggleMenu": "Alternar menu"
   },
   "usersTable": {
     "name": "Nome",
@@ -270,6 +271,16 @@
     "themeDescription": "Personalize a aparência da interface no seu dispositivo.",
     "language": "Idioma",
     "selectLanguage": "Selecione o idioma",
-    "languageDescription": "Selecione o seu idioma preferido para a interface."
+    "languageDescription": "Selecione o seu idioma preferido para a interface.",
+    "colorPalette": "Paleta de Cores",
+    "selectColorPalette": "Selecione a paleta",
+    "paletteDescription": "Escolha a cor principal para sua interface.",
+    "palettes": {
+      "zinc": "Zinco (Padrão)",
+      "rose": "Rosa",
+      "blue": "Azul",
+      "green": "Verde",
+      "orange": "Laranja"
+    }
   }
 }

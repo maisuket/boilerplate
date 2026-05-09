@@ -41,7 +41,8 @@
     "notifications": "Notifications",
     "profile": "Profile",
     "settings": "Settings",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "toggleMenu": "Toggle menu"
   },
   "usersTable": {
     "name": "Name",
@@ -270,6 +271,16 @@
     "themeDescription": "Customize how the interface looks on your device.",
     "language": "Language",
     "selectLanguage": "Select language",
-    "languageDescription": "Select your preferred language for the interface."
+    "languageDescription": "Select your preferred language for the interface.",
+    "colorPalette": "Color Palette",
+    "selectColorPalette": "Select color palette",
+    "paletteDescription": "Choose the primary color for your interface.",
+    "palettes": {
+      "zinc": "Zinc (Default)",
+      "rose": "Rose",
+      "blue": "Blue",
+      "green": "Green",
+      "orange": "Orange"
+    }
   }
 }
