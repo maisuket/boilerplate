@@ -20,6 +20,7 @@ import {
 import { createUserSchema, type CreateUserFormData } from "@/schemas/user.schema";
 import { PasswordInput } from "./password-input";
 import { useCreateUser } from "@/hooks/use-user-mutations";
+import { USER_ROLES } from "@/constants/roles";
 
 export function AddUserDialog() {
   const [open, setOpen] = useState(false);
@@ -166,9 +167,11 @@ export function AddUserDialog() {
                 disabled={createMutation.isPending}
                 {...register("role")}
               >
-                <option value="USER">User</option>
-                <option value="ADMIN">Admin</option>
-                <option value="MODERATOR">Moderator</option>
+                {USER_ROLES.map((role) => (
+                  <option key={role} value={role}>
+                    {role.charAt(0) + role.slice(1).toLowerCase()}
+                  </option>
+                ))}
               </select>
               {errors.role && <p className="text-sm text-destructive">{errors.role.message}</p>}
             </div>

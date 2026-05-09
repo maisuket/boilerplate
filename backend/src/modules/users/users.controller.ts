@@ -12,19 +12,13 @@ import {
   HttpStatus,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiParam,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
-import { PaginationDto } from '../../shared/dto/pagination.dto';
+import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { JwtAuthGuard } from '../../shared/guards/jwt-auth.guard';
 import { RolesGuard } from '../../shared/guards/roles.guard';
 import { Roles } from '../../shared/decorators/roles.decorator';
@@ -54,8 +48,8 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users with pagination (Admin only)' })
   @ApiPaginatedResponse(UserResponseDto)
   @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
-  async findAll(@Query() paginationDto: PaginationDto) {
-    return this.usersService.findAll(paginationDto);
+  async findAll(@Query() query: FindAllUsersDto) {
+    return this.usersService.findAll(query);
   }
 
   @Get(':id')
@@ -109,9 +103,7 @@ export class UsersController {
   @ApiParam({ name: 'id', description: 'User UUID' })
   @ApiResponse({ status: 200, description: 'User status toggled', type: UserResponseDto })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
-  async toggleActive(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<UserResponseDto> {
+  async toggleActive(@Param('id', ParseUUIDPipe) id: string): Promise<UserResponseDto> {
     return this.usersService.toggleActive(id);
   }
 }

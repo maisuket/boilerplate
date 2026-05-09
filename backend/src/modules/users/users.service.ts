@@ -8,7 +8,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
-import { PaginationDto } from '../../shared/dto/pagination.dto';
+import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { PaginatedResult } from '../../shared/interfaces/pagination.interface';
 import {
   buildPaginationParams,
@@ -16,7 +16,7 @@ import {
   buildSearchQuery,
 } from '../../shared/utils/pagination.util';
 import { hashPassword } from '../../shared/utils/hash.util';
-import { Role } from '@prisma/client';
+import { Role, Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -46,14 +46,20 @@ export class UsersService {
     return new UserResponseDto(user);
   }
 
-  async findAll(
-    paginationDto: PaginationDto,
-  ): Promise<PaginatedResult<UserResponseDto>> {
-    const params = buildPaginationParams(paginationDto);
+  async findAll(query: FindAllUsersDto): Promise<PaginatedResult<UserResponseDto>> {
+    const params = buildPaginationParams(query);
 
-    const searchQuery = buildSearchQuery(paginationDto.search, ['name', 'email']);
+    const searchQuery = buildSearchQuery(query.search, ['name', 'email']);
 
-    const where = searchQuery || undefined;
+    const where: Prisma.UserWhereInput = searchQuery || {};
+
+    if (query.status) {
+      where.isActive = query.status === 'active';
+    }
+
+    if (query.role) {
+      where.role = query.role;
+    }
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
@@ -153,11 +159,7 @@ export class UsersService {
     return new UserResponseDto(updated);
   }
 
-  async remove(
-    id: string,
-    requestingUserId: string,
-    requestingUserRole: Role,
-  ): Promise<void> {
+  async remove(id: string, requestingUserId: string, requestingUserRole: Role): Promise<void> {
     const user = await this.prisma.user.findUnique({ where: { id } });
 
     if (!user) {

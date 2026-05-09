@@ -23,9 +23,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           onMobileMenuToggle={() => setMobileSidebarOpen(true)}
           sidebarCollapsed={sidebarCollapsed}
         />
-        <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto p-6 max-w-7xl">
-            {children}
+        <main className="flex flex-1 flex-col overflow-hidden">
+          {/* Wrapper que joga a barra de rolagem para o canto da tela */}
+          <div className="flex-1 overflow-y-auto w-full">
+            <div className="container mx-auto flex flex-col min-h-full p-6 max-w-7xl">
+              {children}
+            </div>
           </div>
         </main>
       </div>

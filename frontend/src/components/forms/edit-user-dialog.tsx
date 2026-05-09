@@ -18,6 +18,7 @@ import {
 import { updateUserSchema, type UpdateUserFormData } from "@/schemas/user.schema";
 import type { User } from "@/types/user.types";
 import { useUpdateUser } from "@/hooks/use-user-mutations";
+import { USER_ROLES } from "@/constants/roles";
 
 interface EditUserDialogProps {
   user: User | null;
@@ -108,9 +109,11 @@ export function EditUserDialog({ user, onClose }: EditUserDialogProps) {
                 disabled={updateMutation.isPending}
                 {...register("role")}
               >
-                <option value="USER">User</option>
-                <option value="ADMIN">Admin</option>
-                <option value="MODERATOR">Moderator</option>
+                {USER_ROLES.map((role) => (
+                  <option key={role} value={role}>
+                    {role.charAt(0) + role.slice(1).toLowerCase()}
+                  </option>
+                ))}
               </select>
               {errors.role && <p className="text-sm text-destructive">{errors.role.message}</p>}
             </div>

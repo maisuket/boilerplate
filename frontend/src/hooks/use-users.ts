@@ -8,12 +8,24 @@ interface UseUsersOptions {
   page: number;
   limit: number;
   search?: string;
+  status?: string;
+  role?: string;
+  sortBy?: string;
+  sortOrder?: string;
 }
 
-export function useUsers({ page, limit, search }: UseUsersOptions) {
+export function useUsers({
+  page,
+  limit,
+  search,
+  status,
+  role,
+  sortBy,
+  sortOrder,
+}: UseUsersOptions) {
   const query = useQuery({
-    queryKey: QUERY_KEYS.users.list({ page, search }),
-    queryFn: () => usersService.getUsers({ page, limit, search }),
+    queryKey: QUERY_KEYS.users.list({ page, search, status, role, sortBy, sortOrder }),
+    queryFn: () => usersService.getUsers({ page, limit, search, status, role, sortBy, sortOrder }),
     placeholderData: (prev) => prev,
   });
 
