@@ -25,6 +25,7 @@ export function ChangePasswordForm({ onDirtyChange }: ChangePasswordFormProps = 
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const tValidation = useTranslations("validation");
+  const t = useTranslations("changePasswordForm");
 
   const {
     register,
@@ -55,11 +56,11 @@ export function ChangePasswordForm({ onDirtyChange }: ChangePasswordFormProps = 
   const passwordMutation = useMutation({
     mutationFn: (data: ChangePasswordFormData) => usersService.changePassword(data),
     onSuccess: () => {
-      toast.success("Password updated", "Your password has been changed successfully.");
+      toast.success(t("toastSuccessTitle"), t("toastSuccessDescription"));
       reset();
     },
     onError: (error) => {
-      toast.error("Error", getErrorMessage(error));
+      toast.error(t("toastErrorTitle"), getErrorMessage(error));
     },
   });
 
@@ -78,10 +79,10 @@ export function ChangePasswordForm({ onDirtyChange }: ChangePasswordFormProps = 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-xl">
       <div className="space-y-2">
-        <Label htmlFor="currentPassword">Current Password</Label>
+        <Label htmlFor="currentPassword">{t("currentPassword")}</Label>
         <PasswordInput
           id="currentPassword"
-          placeholder="Enter current password"
+          placeholder={t("currentPasswordPlaceholder")}
           error={!!errors.currentPassword}
           disabled={passwordMutation.isPending}
           showPassword={showCurrentPassword}
@@ -95,7 +96,7 @@ export function ChangePasswordForm({ onDirtyChange }: ChangePasswordFormProps = 
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="newPassword">New Password</Label>
+          <Label htmlFor="newPassword">{t("newPassword")}</Label>
           <button
             type="button"
             onClick={handleGeneratePassword}
@@ -103,12 +104,12 @@ export function ChangePasswordForm({ onDirtyChange }: ChangePasswordFormProps = 
             tabIndex={-1}
             disabled={passwordMutation.isPending}
           >
-            Generate random password
+            {t("generateRandom")}
           </button>
         </div>
         <PasswordInput
           id="newPassword"
-          placeholder="Create a new password"
+          placeholder={t("newPasswordPlaceholder")}
           error={!!errors.newPassword}
           disabled={passwordMutation.isPending}
           showCopy
@@ -124,10 +125,10 @@ export function ChangePasswordForm({ onDirtyChange }: ChangePasswordFormProps = 
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="confirmNewPassword">Confirm New Password</Label>
+        <Label htmlFor="confirmNewPassword">{t("confirmNewPassword")}</Label>
         <PasswordInput
           id="confirmNewPassword"
-          placeholder="Confirm your new password"
+          placeholder={t("confirmNewPasswordPlaceholder")}
           error={!!errors.confirmNewPassword}
           disabled={passwordMutation.isPending}
           showPassword={showConfirmPassword}
@@ -140,7 +141,7 @@ export function ChangePasswordForm({ onDirtyChange }: ChangePasswordFormProps = 
       </div>
 
       <Button type="submit" loading={passwordMutation.isPending} disabled={!isDirty}>
-        {passwordMutation.isPending ? "Updating password..." : "Update Password"}
+        {passwordMutation.isPending ? t("updating") : t("update")}
       </Button>
     </form>
   );

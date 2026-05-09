@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslations } from "next-intl";
 
 interface UnsavedChangesDialogProps {
   open: boolean;
@@ -23,23 +24,25 @@ export function UnsavedChangesDialog({
   open,
   onOpenChange,
   onConfirm,
-  title = "Unsaved Changes",
-  description = "You have unsaved changes. Are you sure you want to close this form? All your modifications will be lost.",
+  title,
+  description,
 }: UnsavedChangesDialogProps) {
+  const t = useTranslations("dialogs.unsavedChanges");
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogTitle>{title || t("title")}</AlertDialogTitle>
+          <AlertDialogDescription>{description || t("description")}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Keep Editing</AlertDialogCancel>
+          <AlertDialogCancel>{t("keepEditing")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            Discard Changes
+            {t("discardChanges")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

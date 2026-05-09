@@ -50,6 +50,7 @@ interface ResetPasswordDialogProps {
 export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps) {
   const [showPassword, setShowPassword] = useState(false);
   const t = useTranslations("validation");
+  const tMutations = useTranslations("userMutations");
   const resetPasswordSchema = getResetPasswordSchema(t);
 
   const {
@@ -71,8 +72,8 @@ export function ResetPasswordDialog({ user, onClose }: ResetPasswordDialogProps)
 
   const resetMutation = useUpdateUser({
     successMessage: {
-      title: "Password reset",
-      description: "The user's password has been successfully updated.",
+      title: tMutations("resetSuccessTitle"),
+      description: tMutations("resetSuccessDescription"),
     },
     onSuccess: () => {
       reset();

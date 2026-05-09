@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslations } from "next-intl";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -29,13 +30,15 @@ export function ConfirmDialog({
   onOpenChange,
   title,
   description,
-  cancelText = "Cancel",
-  confirmText = "Confirm",
-  loadingText = "Loading...",
+  cancelText,
+  confirmText,
+  loadingText,
   onConfirm,
   isPending = false,
   variant = "default",
 }: ConfirmDialogProps) {
+  const t = useTranslations("dialogs.confirm");
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -44,7 +47,7 @@ export function ConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>{cancelText}</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>{cancelText || t("cancel")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             loading={isPending}
@@ -54,7 +57,7 @@ export function ConfirmDialog({
                 : ""
             }
           >
-            {isPending ? loadingText : confirmText}
+            {isPending ? loadingText || t("loading") : confirmText || t("confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

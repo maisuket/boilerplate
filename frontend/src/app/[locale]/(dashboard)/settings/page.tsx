@@ -11,11 +11,13 @@ import { ChangePasswordForm } from "@/components/forms/change-password-form";
 import { useLeaveWarning } from "@/hooks/use-leave-warning";
 import { UnsavedChangesDialog } from "@/components/dialogs/unsaved-changes-dialog";
 import { TermsOfServiceDialog } from "@/components/dialogs/terms-of-service-dialog";
+import { useTranslations } from "next-intl";
 
 export default function SettingsPage() {
   const [isDirty, setIsDirty] = useState(false);
   const [pendingProceed, setPendingProceed] = useState<(() => void) | null>(null);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const t = useTranslations("settingsPage");
 
   // Evita fechamento da página ou botão de 'voltar' do navegador se tiver alterações não salvas
   useLeaveWarning(isDirty, (proceed) => setPendingProceed(() => proceed));
@@ -42,10 +44,8 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col space-y-8 pb-10">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage your account settings and security preferences.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground mt-1">{t("description")}</p>
       </div>
 
       <TabsSync
@@ -58,19 +58,19 @@ export default function SettingsPage() {
             value="profile"
             className="relative rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
           >
-            Profile
+            {t("tabs.profile")}
           </TabsTrigger>
           <TabsTrigger
             value="security"
             className="relative rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
           >
-            Security
+            {t("tabs.security")}
           </TabsTrigger>
           <TabsTrigger
             value="legal"
             className="relative rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
           >
-            Legal
+            {t("tabs.legal")}
           </TabsTrigger>
         </TabsList>
 
@@ -80,10 +80,8 @@ export default function SettingsPage() {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>
-                Update your personal information and how others see you on the platform.
-              </CardDescription>
+              <CardTitle>{t("profile.title")}</CardTitle>
+              <CardDescription>{t("profile.description")}</CardDescription>
             </CardHeader>
             <CardContent>
               <ProfileForm onDirtyChange={setIsDirty} />
@@ -97,8 +95,8 @@ export default function SettingsPage() {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Security</CardTitle>
-              <CardDescription>Update your password to keep your account secure.</CardDescription>
+              <CardTitle>{t("security.title")}</CardTitle>
+              <CardDescription>{t("security.description")}</CardDescription>
             </CardHeader>
             <CardContent>
               <ChangePasswordForm onDirtyChange={setIsDirty} />
@@ -112,21 +110,19 @@ export default function SettingsPage() {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Legal Information</CardTitle>
-              <CardDescription>Review the terms and policies of our platform.</CardDescription>
+              <CardTitle>{t("legal.title")}</CardTitle>
+              <CardDescription>{t("legal.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col space-y-2">
-                <h3 className="text-sm font-medium">Terms of Service</h3>
-                <p className="text-sm text-muted-foreground">
-                  Read our terms of service to understand your rights and responsibilities.
-                </p>
+                <h3 className="text-sm font-medium">{t("legal.termsTitle")}</h3>
+                <p className="text-sm text-muted-foreground">{t("legal.termsDescription")}</p>
                 <Button
                   variant="outline"
                   className="w-fit mt-2"
                   onClick={() => setIsTermsOpen(true)}
                 >
-                  View Terms of Service
+                  {t("legal.viewTerms")}
                 </Button>
               </div>
             </CardContent>
@@ -138,7 +134,7 @@ export default function SettingsPage() {
         open={!!pendingProceed}
         onOpenChange={(open) => !open && setPendingProceed(null)}
         onConfirm={confirmTabChange}
-        description="You have unsaved changes in this tab. If you leave now, all your modifications will be permanently lost. Are you sure you want to discard them?"
+        description={t("unsavedChanges")}
       />
       <TermsOfServiceDialog open={isTermsOpen} onOpenChange={setIsTermsOpen} />
     </div>

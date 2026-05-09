@@ -2,6 +2,7 @@
 
 import { useDeleteUser } from "@/hooks/use-user-mutations";
 import { ConfirmDialog } from "@/components/dialogs/confirm-dialog";
+import { useTranslations } from "next-intl";
 
 interface DeleteUserDialogProps {
   userId: string | null;
@@ -9,6 +10,8 @@ interface DeleteUserDialogProps {
 }
 
 export function DeleteUserDialog({ userId, onClose }: DeleteUserDialogProps) {
+  const t = useTranslations("dialogs.deleteUser");
+
   const deleteMutation = useDeleteUser({
     onSuccess: () => {
       onClose();
@@ -26,10 +29,10 @@ export function DeleteUserDialog({ userId, onClose }: DeleteUserDialogProps) {
     <ConfirmDialog
       open={!!userId}
       onOpenChange={(open) => !open && onClose()}
-      title="Are you absolutely sure?"
-      description="This action cannot be undone. This will permanently delete the user and remove their data from our servers."
-      confirmText="Delete"
-      loadingText="Deleting..."
+      title={t("title")}
+      description={t("description")}
+      confirmText={t("confirm")}
+      loadingText={t("loading")}
       onConfirm={handleDelete}
       isPending={deleteMutation.isPending}
       variant="destructive"

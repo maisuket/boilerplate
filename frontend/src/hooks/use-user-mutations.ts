@@ -10,6 +10,7 @@ import {
   handleOptimisticError,
   paginatedCacheUpdater,
 } from "@/utils/optimistic-updates";
+import { useTranslations } from "next-intl";
 
 interface MutationOptions {
   onSuccess?: () => void;
@@ -19,6 +20,7 @@ interface MutationOptions {
 export function useCreateUser(options?: MutationOptions) {
   const toast = useToast();
   const queryClient = useQueryClient();
+  const t = useTranslations("userMutations");
 
   return useMutation({
     mutationFn: usersService.createUser,
@@ -30,12 +32,12 @@ export function useCreateUser(options?: MutationOptions) {
     },
     onError: (error, _, context) => {
       handleOptimisticError(queryClient, context as any);
-      toast.error("Error", getErrorMessage(error));
+      toast.error(t("errorTitle"), getErrorMessage(error));
     },
     onSuccess: () => {
       toast.success(
-        options?.successMessage?.title ?? "User created",
-        options?.successMessage?.description ?? "The user has been successfully created."
+        options?.successMessage?.title ?? t("createSuccessTitle"),
+        options?.successMessage?.description ?? t("createSuccessDescription")
       );
       options?.onSuccess?.();
     },
@@ -48,6 +50,7 @@ export function useCreateUser(options?: MutationOptions) {
 export function useUpdateUser(options?: MutationOptions) {
   const toast = useToast();
   const queryClient = useQueryClient();
+  const t = useTranslations("userMutations");
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<UpdateUserFormData> | any }) =>
@@ -59,12 +62,12 @@ export function useUpdateUser(options?: MutationOptions) {
     },
     onError: (error, _, context) => {
       handleOptimisticError(queryClient, context as any);
-      toast.error("Error", getErrorMessage(error));
+      toast.error(t("errorTitle"), getErrorMessage(error));
     },
     onSuccess: () => {
       toast.success(
-        options?.successMessage?.title ?? "User updated",
-        options?.successMessage?.description ?? "The user has been successfully updated."
+        options?.successMessage?.title ?? t("updateSuccessTitle"),
+        options?.successMessage?.description ?? t("updateSuccessDescription")
       );
       options?.onSuccess?.();
     },
@@ -77,6 +80,7 @@ export function useUpdateUser(options?: MutationOptions) {
 export function useDeleteUser(options?: MutationOptions) {
   const toast = useToast();
   const queryClient = useQueryClient();
+  const t = useTranslations("userMutations");
 
   return useMutation({
     mutationFn: usersService.deleteUser,
@@ -87,12 +91,12 @@ export function useDeleteUser(options?: MutationOptions) {
     },
     onError: (error, _, context) => {
       handleOptimisticError(queryClient, context as any);
-      toast.error("Error", getErrorMessage(error));
+      toast.error(t("errorTitle"), getErrorMessage(error));
     },
     onSuccess: () => {
       toast.success(
-        options?.successMessage?.title ?? "User deleted",
-        options?.successMessage?.description ?? "The user has been successfully removed."
+        options?.successMessage?.title ?? t("deleteSuccessTitle"),
+        options?.successMessage?.description ?? t("deleteSuccessDescription")
       );
       options?.onSuccess?.();
     },

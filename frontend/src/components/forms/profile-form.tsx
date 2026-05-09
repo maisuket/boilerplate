@@ -26,6 +26,7 @@ export function ProfileForm({ onDirtyChange }: ProfileFormProps = {}) {
   const toast = useToast();
   const queryClient = useQueryClient();
   const tValidation = useTranslations("validation");
+  const t = useTranslations("profileForm");
 
   const {
     register,
@@ -64,10 +65,10 @@ export function ProfileForm({ onDirtyChange }: ProfileFormProps = {}) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.auth.me() });
       await refreshUser();
-      toast.success("Profile updated", "Your profile has been saved successfully.");
+      toast.success(t("toastSuccessTitle"), t("toastSuccessDescription"));
     },
     onError: (error) => {
-      toast.error("Update failed", getErrorMessage(error));
+      toast.error(t("toastErrorTitle"), getErrorMessage(error));
     },
   });
 
@@ -96,18 +97,18 @@ export function ProfileForm({ onDirtyChange }: ProfileFormProps = {}) {
           <p className="text-sm font-medium">{user?.name}</p>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
           <button type="button" className="mt-2 text-xs text-primary hover:underline">
-            Change avatar
+            {t("changeAvatar")}
           </button>
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="name">Full name</Label>
+          <Label htmlFor="name">{t("fullName")}</Label>
           <Input
             id="name"
             type="text"
-            placeholder="John Doe"
+            placeholder={t("namePlaceholder")}
             error={!!errors.name}
             disabled={updateMutation.isPending}
             {...register("name")}
@@ -116,11 +117,11 @@ export function ProfileForm({ onDirtyChange }: ProfileFormProps = {}) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">Email address</Label>
+          <Label htmlFor="email">{t("emailAddress")}</Label>
           <Input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={t("emailPlaceholder")}
             error={!!errors.email}
             disabled={updateMutation.isPending}
             {...register("email")}
@@ -129,11 +130,11 @@ export function ProfileForm({ onDirtyChange }: ProfileFormProps = {}) {
         </div>
 
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="avatar">Avatar URL</Label>
+          <Label htmlFor="avatar">{t("avatarUrl")}</Label>
           <Input
             id="avatar"
             type="url"
-            placeholder="https://example.com/avatar.jpg"
+            placeholder={t("avatarPlaceholder")}
             error={!!errors.avatar}
             disabled={updateMutation.isPending}
             {...register("avatar")}
@@ -144,7 +145,7 @@ export function ProfileForm({ onDirtyChange }: ProfileFormProps = {}) {
 
       <div className="flex gap-3">
         <Button type="submit" loading={updateMutation.isPending} disabled={!isDirty}>
-          {updateMutation.isPending ? "Saving..." : "Save Changes"}
+          {updateMutation.isPending ? t("saving") : t("saveChanges")}
         </Button>
         <Button
           type="button"
@@ -152,7 +153,7 @@ export function ProfileForm({ onDirtyChange }: ProfileFormProps = {}) {
           onClick={() => reset()}
           disabled={!isDirty || updateMutation.isPending}
         >
-          Discard
+          {t("discard")}
         </Button>
       </div>
     </form>
