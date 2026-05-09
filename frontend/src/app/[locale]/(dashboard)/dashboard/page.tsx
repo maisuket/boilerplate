@@ -5,10 +5,22 @@ import { StatsCard } from "@/components/dashboard/stats-card";
 import { RecentTable } from "@/components/dashboard/recent-table";
 import { AreaChartComponent } from "@/components/charts/area-chart";
 import { BarChartComponent } from "@/components/charts/bar-chart";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Dashboard",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "dashboardPage" });
+
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 const revenueData = [
   { month: "Jan", revenue: 4200, users: 240 },
@@ -78,81 +90,81 @@ const recentOrders = [
 ];
 
 export default function DashboardPage() {
+  const t = useTranslations("dashboardPage");
+
   return (
     <div className="space-y-6 animate-in">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Welcome back! Here&apos;s an overview of your business.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground mt-1">{t("description")}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatsCard
-          title="Total Revenue"
+          title={t("totalRevenue")}
           value="$84,254"
-          description="+20.1% from last month"
+          description={`+20.1% ${t("fromLastMonth")}`}
           trend={20.1}
           icon={DollarSign}
-          iconColor="text-emerald-500"
-          iconBg="bg-emerald-500/10"
+          iconColor="text-primary"
+          iconBg="bg-primary/10"
         />
         <StatsCard
-          title="Active Users"
+          title={t("activeUsers")}
           value="4,623"
-          description="+15.3% from last month"
+          description={`+15.3% ${t("fromLastMonth")}`}
           trend={15.3}
           icon={Users}
-          iconColor="text-blue-500"
-          iconBg="bg-blue-500/10"
+          iconColor="text-[hsl(var(--chart-2))]"
+          iconBg="bg-[hsl(var(--chart-2))/0.1]"
         />
         <StatsCard
-          title="New Orders"
+          title={t("newOrders")}
           value="1,284"
-          description="+8.7% from last month"
+          description={`+8.7% ${t("fromLastMonth")}`}
           trend={8.7}
           icon={ShoppingCart}
-          iconColor="text-violet-500"
-          iconBg="bg-violet-500/10"
+          iconColor="text-[hsl(var(--chart-3))]"
+          iconBg="bg-[hsl(var(--chart-3))/0.1]"
         />
         <StatsCard
-          title="Growth Rate"
+          title={t("growthRate")}
           value="12.5%"
-          description="-2.4% from last month"
+          description={`-2.4% ${t("fromLastMonth")}`}
           trend={-2.4}
           icon={TrendingUp}
-          iconColor="text-orange-500"
-          iconBg="bg-orange-500/10"
+          iconColor="text-[hsl(var(--chart-4))]"
+          iconBg="bg-[hsl(var(--chart-4))/0.1]"
         />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-7">
         <div className="lg:col-span-4">
           <AreaChartComponent
-            title="Revenue Overview"
-            description="Monthly revenue and user growth"
+            title={t("revenueOverview")}
+            description={t("revenueDescription")}
             data={revenueData}
             areas={[
-              { dataKey: "revenue", name: "Revenue", color: "#3b82f6" },
-              { dataKey: "users", name: "Users", color: "#8b5cf6" },
+              { dataKey: "revenue", name: t("revenue"), color: "hsl(var(--chart-1))" },
+              { dataKey: "users", name: t("users"), color: "hsl(var(--chart-2))" },
             ]}
             xAxisKey="month"
           />
         </div>
         <div className="lg:col-span-3">
           <BarChartComponent
-            title="Sales by Category"
-            description="Top performing product categories"
+            title={t("salesByCategory")}
+            description={t("salesDescription")}
             data={categoryData}
-            bars={[{ dataKey: "sales", name: "Sales", color: "#3b82f6" }]}
+            bars={[{ dataKey: "sales", name: t("sales"), color: "hsl(var(--chart-1))" }]}
             xAxisKey="category"
           />
         </div>
       </div>
 
       <RecentTable
-        title="Recent Orders"
-        description="You have 1,284 orders this month"
+        title={t("recentOrdersTitle")}
+        description={t("recentOrdersDescription", { count: "1,284" })}
         data={recentOrders}
       />
     </div>

@@ -280,7 +280,27 @@
       "rose": "Rosa",
       "blue": "Azul",
       "green": "Verde",
-      "orange": "Laranja"
+      "orange": "Laranja",
+      "purple": "Roxo",
+      "yellow": "Amarelo"
     }
+  },
+  "dashboardPage": {
+    "title": "Dashboard",
+    "description": "Bem-vindo de volta! Aqui está um resumo do seu negócio.",
+    "totalRevenue": "Receita Total",
+    "fromLastMonth": "em relação ao mês passado",
+    "activeUsers": "Usuários Ativos",
+    "newOrders": "Novos Pedidos",
+    "growthRate": "Taxa de Crescimento",
+    "revenueOverview": "Visão Geral da Receita",
+    "revenueDescription": "Receita mensal e crescimento de usuários",
+    "revenue": "Receita",
+    "users": "Usuários",
+    "salesByCategory": "Vendas por Categoria",
+    "salesDescription": "Categorias de produtos com melhor desempenho",
+    "sales": "Vendas",
+    "recentOrdersTitle": "Pedidos Recentes",
+    "recentOrdersDescription": "Você tem {count} pedidos este mês"
   }
 }

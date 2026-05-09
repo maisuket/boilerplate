@@ -128,6 +128,18 @@ export function PreferencesForm() {
                     <span>{t("palettes.orange")}</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="purple">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 rounded-full bg-purple-500" />
+                    <span>{t("palettes.purple")}</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="yellow">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 rounded-full bg-yellow-500" />
+                    <span>{t("palettes.yellow")}</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           )}

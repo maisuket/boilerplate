@@ -280,7 +280,27 @@
       "rose": "Rose",
       "blue": "Blue",
       "green": "Green",
-      "orange": "Orange"
+      "orange": "Orange",
+      "purple": "Purple",
+      "yellow": "Yellow"
     }
+  },
+  "dashboardPage": {
+    "title": "Dashboard",
+    "description": "Welcome back! Here's an overview of your business.",
+    "totalRevenue": "Total Revenue",
+    "fromLastMonth": "from last month",
+    "activeUsers": "Active Users",
+    "newOrders": "New Orders",
+    "growthRate": "Growth Rate",
+    "revenueOverview": "Revenue Overview",
+    "revenueDescription": "Monthly revenue and user growth",
+    "revenue": "Revenue",
+    "users": "Users",
+    "salesByCategory": "Sales by Category",
+    "salesDescription": "Top performing product categories",
+    "sales": "Sales",
+    "recentOrdersTitle": "Recent Orders",
+    "recentOrdersDescription": "You have {count} orders this month"
   }
 }
