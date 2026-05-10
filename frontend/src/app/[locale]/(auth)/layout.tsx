@@ -16,24 +16,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Imagem Inspiradora (Esquerda - Escondido no Mobile) */}
       <div className="relative hidden w-full lg:block lg:w-1/2 xl:w-7/12">
         <div
-          className="absolute inset-0 bg-zinc-900 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-zinc-900 bg-contain bg-center bg-no-repeat"
           style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1590069261209-f8e9b8642343?q=80&w=1920&auto=format&fit=crop')",
+            backgroundImage: "url('/background-retrato-login.png')",
           }}
+          // style={{ backgroundImage: "url('../../public/background-login.png')" }}
         >
           <div className="absolute inset-0 bg-zinc-900/40 mix-blend-multiply" />
-        </div>
-        <div className="relative z-20 flex h-full flex-col justify-end p-10 text-white lg:p-14">
-          <blockquote className="space-y-2 max-w-lg">
-            <p className="text-xl font-medium leading-relaxed">
-              &ldquo;This boilerplate has saved our team hundreds of hours. The combination of
-              Next.js, NestJS, and clean architecture is absolutely incredible.&rdquo;
-            </p>
-            <footer className="text-sm font-medium text-zinc-300">
-              &mdash; Daisuke, Lead Developer
-            </footer>
-          </blockquote>
         </div>
       </div>
       {/* Formulário (Direita) */}

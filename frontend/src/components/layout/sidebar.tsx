@@ -64,20 +64,21 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose, onToggleCollapse
           )}
         >
           <Link href={ROUTES.DASHBOARD} className="flex items-center overflow-hidden">
-            <div className="w-8 h-8 bg-[hsl(var(--sidebar-primary))] rounded-lg flex items-center justify-center shrink-0">
-              <span className="font-bold text-white">{collapsed ? "V" : "Z"}</span>
+            {/* Ícone da Logo (Exibido sempre, inclusive na versão colapsada) */}
+            <div className="w-28 h-18 flex items-center justify-center shrink-0 overflow-hidden">
+              <img src="/logo-sidebar.png" alt="Ícone" className="w-full h-full object-contain" />
             </div>
+
+            {/* Texto ou Versão Completa da Logo (Exibido apenas quando a sidebar está expandida) */}
             <AnimatePresence>
               {!collapsed && (
-                <motion.span
+                <motion.div
                   initial={{ width: 0, opacity: 0, marginLeft: 0 }}
                   animate={{ width: "auto", opacity: 1, marginLeft: 8 }}
                   exit={{ width: 0, opacity: 0, marginLeft: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="text-xl font-bold tracking-tight whitespace-nowrap"
-                >
-                  ota
-                </motion.span>
+                  className="flex items-center overflow-hidden whitespace-nowrap"
+                ></motion.div>
               )}
             </AnimatePresence>
           </Link>
