@@ -21,6 +21,16 @@ import { hashPassword } from '../../shared/utils/hash.util';
 import { Role, Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
+const safeUserSelect: Prisma.UserSelect = {
+  id: true,
+  name: true,
+  email: true,
+  role: true,
+  isActive: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -28,6 +38,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const existing = await this.prisma.user.findUnique({
       where: { email: createUserDto.email.toLowerCase() },
+      select: { id: true }, // Optimization: Only need ID for existence check
     });
 
     if (existing) {
@@ -44,6 +55,7 @@ export class UsersService {
         role: createUserDto.role,
         isActive: createUserDto.isActive ?? true,
       },
+      select: safeUserSelect,
     });
 
     return new UserResponseDto(user);
@@ -70,17 +82,7 @@ export class UsersService {
         skip: params.skip,
         take: params.limit,
         orderBy: params.orderBy,
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          isActive: true,
-          createdAt: true,
-          updatedAt: true,
-          password: false,
-          refreshToken: false,
-        },
+        select: safeUserSelect,
       }),
       this.prisma.user.count({ where }),
     ]);
@@ -93,6 +95,7 @@ export class UsersService {
   async findOne(id: string): Promise<UserResponseDto> {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      select: safeUserSelect,
     });
 
     if (!user) {
@@ -105,6 +108,7 @@ export class UsersService {
   async findByEmail(email: string): Promise<UserResponseDto | null> {
     const user = await this.prisma.user.findUnique({
       where: { email: email.toLowerCase() },
+      select: safeUserSelect,
     });
 
     if (!user) return null;
@@ -118,7 +122,10 @@ export class UsersService {
     requestingUserId: string,
     requestingUserRole: Role,
   ): Promise<UserResponseDto> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: { id: true },
+    });
 
     if (!user) {
       throw new NotFoundException(`User with ID '${id}' not found`);
@@ -134,7 +141,7 @@ export class UsersService {
       throw new ForbiddenException('Only admins can change user roles');
     }
 
-    const updateData: any = { ...updateUserDto };
+    const updateData: Prisma.UserUpdateInput = { ...updateUserDto };
 
     if (updateUserDto.email) {
       const existingEmail = await this.prisma.user.findFirst({
@@ -142,6 +149,7 @@ export class UsersService {
           email: updateUserDto.email.toLowerCase(),
           NOT: { id },
         },
+        select: { id: true },
       });
 
       if (existingEmail) {
@@ -157,13 +165,17 @@ export class UsersService {
     const updated = await this.prisma.user.update({
       where: { id },
       data: updateData,
+      select: safeUserSelect,
     });
 
     return new UserResponseDto(updated);
   }
 
   async remove(id: string, requestingUserId: string, requestingUserRole: Role): Promise<void> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: { id: true },
+    });
 
     if (!user) {
       throw new NotFoundException(`User with ID '${id}' not found`);
@@ -181,7 +193,10 @@ export class UsersService {
   }
 
   async toggleActive(id: string): Promise<UserResponseDto> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: { id: true, isActive: true },
+    });
 
     if (!user) {
       throw new NotFoundException(`User with ID '${id}' not found`);
@@ -190,13 +205,17 @@ export class UsersService {
     const updated = await this.prisma.user.update({
       where: { id },
       data: { isActive: !user.isActive },
+      select: safeUserSelect,
     });
 
     return new UserResponseDto(updated);
   }
 
   async changePassword(id: string, dto: ChangePasswordDto): Promise<void> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: { id: true, password: true }, // Precisamos da senha aqui para validar
+    });
 
     if (!user) {
       throw new NotFoundException(`User with ID '${id}' not found`);
@@ -213,6 +232,7 @@ export class UsersService {
     await this.prisma.user.update({
       where: { id },
       data: { password: hashedPassword },
+      select: { id: true }, // Evita retornar dados desnecessários
     });
   }
 }

@@ -45,6 +45,15 @@ export class AuthService {
         password: hashedPassword,
         role: registerDto.role,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     // Send welcome email (non-blocking)
@@ -55,17 +64,25 @@ export class AuthService {
     const tokens = await this.generateTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    const { password, refreshToken, ...userProfile } = user;
-
     return {
       ...tokens,
-      user: userProfile,
+      user,
     };
   }
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
     const user = await this.prisma.user.findUnique({
       where: { email: loginDto.email.toLowerCase() },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true, // Necessário para a validação abaixo
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     if (!user) {
@@ -85,7 +102,7 @@ export class AuthService {
     const tokens = await this.generateTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    const { password, refreshToken, ...userProfile } = user;
+    const { password, ...userProfile } = user;
 
     return {
       ...tokens,
@@ -93,7 +110,7 @@ export class AuthService {
     };
   }
 
-  async refreshTokens(userId: string, refreshToken: string): Promise<TokensDto> {
+  async refreshTokens(userId: string): Promise<TokensDto> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -136,7 +153,7 @@ export class AuthService {
     return user;
   }
 
-  private async generateTokens(user: User): Promise<TokensDto> {
+  private async generateTokens(user: Pick<User, 'id' | 'email' | 'role'>): Promise<TokensDto> {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -150,7 +167,7 @@ export class AuthService {
       }),
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('jwt.refreshSecret'),
-        expiresIn: this.configService.getOrThrow<string>('jwt.expiresIn') as any,
+        expiresIn: this.configService.getOrThrow<string>('jwt.refreshExpiresIn') as any,
       }),
     ]);
 

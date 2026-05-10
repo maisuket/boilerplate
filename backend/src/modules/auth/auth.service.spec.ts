@@ -134,10 +134,7 @@ describe('AuthService', () => {
 
       // Allow async email sending
       await new Promise(resolve => setTimeout(resolve, 10));
-      expect(mailService.sendWelcomeEmail).toHaveBeenCalledWith(
-        mockUser.email,
-        mockUser.name,
-      );
+      expect(mailService.sendWelcomeEmail).toHaveBeenCalledWith(mockUser.email, mockUser.name);
     });
 
     it('should normalize email to lowercase', async () => {
@@ -198,9 +195,7 @@ describe('AuthService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(inactiveUser);
 
       await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
-      await expect(service.login(loginDto)).rejects.toThrow(
-        'Your account has been deactivated',
-      );
+      await expect(service.login(loginDto)).rejects.toThrow('Your account has been deactivated');
     });
   });
 
@@ -253,7 +248,7 @@ describe('AuthService', () => {
       mockPrismaService.user.update.mockResolvedValue(mockUser);
       mockJwtService.signAsync.mockResolvedValue('new-access-token');
 
-      const result = await service.refreshTokens(mockUser.id, 'old-refresh-token');
+      const result = await service.refreshTokens(mockUser.id);
 
       expect(result).toBeDefined();
       expect(result.accessToken).toBeDefined();
@@ -263,18 +258,14 @@ describe('AuthService', () => {
     it('should throw UnauthorizedException if user not found during refresh', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.refreshTokens('non-existent-id', 'some-token'),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshTokens('non-existent-id')).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException if stored refresh token is null', async () => {
       const userWithNoToken = { ...mockUser, refreshToken: null };
       mockPrismaService.user.findUnique.mockResolvedValue(userWithNoToken);
 
-      await expect(
-        service.refreshTokens(mockUser.id, 'some-token'),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshTokens(mockUser.id)).rejects.toThrow(UnauthorizedException);
     });
   });
 });

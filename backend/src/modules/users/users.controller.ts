@@ -58,7 +58,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Change current user password' })
   @ApiResponse({ status: 200, description: 'Password successfully updated' })
   async changePassword(
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: { id: string; role: Role },
     @Body() dto: ChangePasswordDto,
   ): Promise<void> {
     return this.usersService.changePassword(currentUser.id, dto);
@@ -71,7 +71,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: { id: string; role: Role },
   ): Promise<UserResponseDto> {
     // Non-admins can only view their own profile
     if (currentUser.role !== Role.ADMIN && currentUser.id !== id) {
@@ -90,7 +90,7 @@ export class UsersController {
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: { id: string; role: Role },
   ): Promise<UserResponseDto> {
     return this.usersService.update(id, updateUserDto, currentUser.id, currentUser.role);
   }
@@ -104,7 +104,7 @@ export class UsersController {
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: { id: string; role: Role },
   ): Promise<void> {
     return this.usersService.remove(id, currentUser.id, currentUser.role);
   }
