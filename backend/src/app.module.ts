@@ -15,7 +15,7 @@ import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
 import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
-import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
+import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
 
 @Module({
   imports: [
@@ -120,7 +120,7 @@ import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
     // Global exception filter
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      useClass: GlobalExceptionFilter,
     },
   ],
 })

@@ -8,11 +8,15 @@ export interface ResponseFormat<T> {
   meta?: any;
   message?: string;
   timestamp: string;
+  requestId: string;
+  path: string;
 }
 
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<T, ResponseFormat<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<ResponseFormat<T>> {
+    const request = context.switchToHttp().getRequest();
+
     return next.handle().pipe(
       map(res => {
         // Se a resposta já vier encapsulada (ex: controllers que estipulam as próprias mensagens)
@@ -31,6 +35,8 @@ export class TransformInterceptor<T> implements NestInterceptor<T, ResponseForma
           data,
           ...(meta !== undefined && { meta }),
           timestamp: new Date().toISOString(),
+          requestId: request.headers['x-request-id'] || 'system-generated-id',
+          path: request.url,
         };
       }),
     );

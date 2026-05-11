@@ -36,6 +36,7 @@ const mockPrismaService = {
     update: jest.fn(),
     delete: jest.fn(),
   },
+  $transaction: jest.fn().mockImplementation(async (callback) => callback(mockPrismaService)),
 };
 
 const mockJwtService = {

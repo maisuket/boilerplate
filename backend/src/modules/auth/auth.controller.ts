@@ -62,19 +62,16 @@ export class AuthController {
     return this.authService.refreshTokens(userId);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout and invalidate refresh token' })
   @ApiResponse({ status: 200, description: 'Logged out successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async logout(@CurrentUser('id') userId: string): Promise<{ message: string }> {
+  async logout(@CurrentUser('id') userId: string): Promise<void> {
     await this.authService.logout(userId);
-    return { message: 'Logged out successfully' };
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('me')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current authenticated user profile' })

@@ -73,12 +73,7 @@ export class UsersController {
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() currentUser: { id: string; role: Role },
   ): Promise<UserResponseDto> {
-    // Non-admins can only view their own profile
-    if (currentUser.role !== Role.ADMIN && currentUser.id !== id) {
-      const { ForbiddenException } = await import('@nestjs/common');
-      throw new ForbiddenException('You can only view your own profile');
-    }
-    return this.usersService.findOne(id);
+    return this.usersService.findOne(id, currentUser.id, currentUser.role);
   }
 
   @Patch(':id')
