@@ -15,6 +15,39 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     });
   }
 
+  public readonly extended = this.$extends({
+    query: {
+      user: {
+        delete: ({ args }) => {
+          return this.user.update({
+            ...args,
+            data: { deletedAt: new Date() },
+          }) as any;
+        },
+        deleteMany: ({ args }) => {
+          return this.user.updateMany({
+            ...args,
+            data: { deletedAt: new Date() },
+          }) as any;
+        },
+        findMany: ({ args, query }) => {
+          args.where = { ...args.where, deletedAt: null };
+          return query(args);
+        },
+        findFirst: ({ args, query }) => {
+          args.where = { ...args.where, deletedAt: null };
+          return query(args);
+        },
+        findUnique: ({ args }) => {
+          return this.user.findFirst({
+            ...args,
+            where: { ...args.where, deletedAt: null },
+          }) as any;
+        },
+      },
+    },
+  });
+
   async onModuleInit() {
     try {
       await this.$connect();

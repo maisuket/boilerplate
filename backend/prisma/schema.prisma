@@ -24,6 +24,7 @@ model User {
   refreshToken String?
   isActive     Boolean    @default(true)
   createdAt    DateTime   @default(now())
+  deletedAt    DateTime?
   updatedAt    DateTime   @updatedAt
   auditLogs    AuditLog[]
 

@@ -5,39 +5,24 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { PaginatedResult } from '../../shared/interfaces/pagination.interface';
-import {
-  buildPaginationParams,
-  buildPaginatedResult,
-  buildSearchQuery,
-} from '../../shared/utils/pagination.util';
-import { hashPassword } from '../../shared/utils/hash.util';
+import { buildPaginatedResult } from '../../shared/utils/pagination.util';
+import { hashPassword, comparePasswords } from '../../shared/utils/hash.util';
 import { Role, Prisma } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
-
-const safeUserSelect: Prisma.UserSelect = {
-  id: true,
-  name: true,
-  email: true,
-  role: true,
-  isActive: true,
-  createdAt: true,
-  updatedAt: true,
-};
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    const existing = await this.prisma.user.findUnique({
-      where: { email: createUserDto.email.toLowerCase() },
+    const existing = await this.usersRepository.findUnique({
+      where: { email: createUserDto.email.toLowerCase(), deletedAt: null },
       select: { id: true }, // Optimization: Only need ID for existence check
     });
 
@@ -46,56 +31,23 @@ export class UsersService {
     }
 
     const hashedPassword = await hashPassword(createUserDto.password);
-
-    const user = await this.prisma.user.create({
-      data: {
-        name: createUserDto.name,
-        email: createUserDto.email.toLowerCase(),
-        password: hashedPassword,
-        role: createUserDto.role,
-        isActive: createUserDto.isActive ?? true,
-      },
-      select: safeUserSelect,
-    });
+    const user = await this.usersRepository.create(createUserDto, hashedPassword);
 
     return new UserResponseDto(user);
   }
 
   async findAll(query: FindAllUsersDto): Promise<PaginatedResult<UserResponseDto>> {
-    const params = buildPaginationParams(query);
+    const [users, total] = await this.usersRepository.findManyAndCount(query);
+    const params = { page: query.page, limit: query.limit };
 
-    const searchQuery = buildSearchQuery(query.search, ['name', 'email']);
-
-    const where: Prisma.UserWhereInput = searchQuery || {};
-
-    if (query.status) {
-      where.isActive = query.status === 'active';
-    }
-
-    if (query.role) {
-      where.role = query.role;
-    }
-
-    const [users, total] = await Promise.all([
-      this.prisma.user.findMany({
-        where,
-        skip: params.skip,
-        take: params.limit,
-        orderBy: params.orderBy,
-        select: safeUserSelect,
-      }),
-      this.prisma.user.count({ where }),
-    ]);
-
-    const userDtos = users.map(u => new UserResponseDto(u as any));
+    const userDtos = users.map(u => new UserResponseDto(u));
 
     return buildPaginatedResult(userDtos, total, params);
   }
 
   async findOne(id: string): Promise<UserResponseDto> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-      select: safeUserSelect,
+    const user = await this.usersRepository.findUnique({
+      where: { id, deletedAt: null },
     });
 
     if (!user) {
@@ -106,9 +58,8 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<UserResponseDto | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
-      select: safeUserSelect,
+    const user = await this.usersRepository.findUnique({
+      where: { email: email.toLowerCase(), deletedAt: null },
     });
 
     if (!user) return null;
@@ -122,8 +73,8 @@ export class UsersService {
     requestingUserId: string,
     requestingUserRole: Role,
   ): Promise<UserResponseDto> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
+    const user = await this.usersRepository.findUnique({
+      where: { id, deletedAt: null },
       select: { id: true },
     });
 
@@ -144,10 +95,11 @@ export class UsersService {
     const updateData: Prisma.UserUpdateInput = { ...updateUserDto };
 
     if (updateUserDto.email) {
-      const existingEmail = await this.prisma.user.findFirst({
+      const existingEmail = await this.usersRepository.findFirst({
         where: {
           email: updateUserDto.email.toLowerCase(),
           NOT: { id },
+          deletedAt: null,
         },
         select: { id: true },
       });
@@ -162,18 +114,14 @@ export class UsersService {
       updateData.password = await hashPassword(updateUserDto.password);
     }
 
-    const updated = await this.prisma.user.update({
-      where: { id },
-      data: updateData,
-      select: safeUserSelect,
-    });
+    const updated = await this.usersRepository.update(id, updateData);
 
     return new UserResponseDto(updated);
   }
 
   async remove(id: string, requestingUserId: string, requestingUserRole: Role): Promise<void> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
+    const user = await this.usersRepository.findUnique({
+      where: { id, deletedAt: null },
       select: { id: true },
     });
 
@@ -189,12 +137,12 @@ export class UsersService {
       throw new ForbiddenException('Admins cannot delete their own account');
     }
 
-    await this.prisma.user.delete({ where: { id } });
+    await this.usersRepository.softDelete(id);
   }
 
   async toggleActive(id: string): Promise<UserResponseDto> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
+    const user = await this.usersRepository.findUnique({
+      where: { id, deletedAt: null },
       select: { id: true, isActive: true },
     });
 
@@ -202,18 +150,14 @@ export class UsersService {
       throw new NotFoundException(`User with ID '${id}' not found`);
     }
 
-    const updated = await this.prisma.user.update({
-      where: { id },
-      data: { isActive: !user.isActive },
-      select: safeUserSelect,
-    });
+    const updated = await this.usersRepository.update(id, { isActive: !user.isActive });
 
     return new UserResponseDto(updated);
   }
 
   async changePassword(id: string, dto: ChangePasswordDto): Promise<void> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
+    const user = await this.usersRepository.findUnique({
+      where: { id, deletedAt: null },
       select: { id: true, password: true }, // Precisamos da senha aqui para validar
     });
 
@@ -221,7 +165,7 @@ export class UsersService {
       throw new NotFoundException(`User with ID '${id}' not found`);
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.password);
+    const isPasswordValid = await comparePasswords(dto.currentPassword, user.password);
 
     if (!isPasswordValid) {
       throw new BadRequestException('Current password is incorrect');
@@ -229,10 +173,6 @@ export class UsersService {
 
     const hashedPassword = await hashPassword(dto.newPassword);
 
-    await this.prisma.user.update({
-      where: { id },
-      data: { password: hashedPassword },
-      select: { id: true }, // Evita retornar dados desnecessários
-    });
+    await this.usersRepository.update(id, { password: hashedPassword });
   }
 }

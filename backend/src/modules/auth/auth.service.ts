@@ -29,7 +29,7 @@ export class AuthService {
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     const existingUser = await this.prisma.user.findUnique({
-      where: { email: registerDto.email.toLowerCase() },
+      where: { email: registerDto.email.toLowerCase(), deletedAt: null },
     });
 
     if (existingUser) {
@@ -38,41 +38,48 @@ export class AuthService {
 
     const hashedPassword = await hashPassword(registerDto.password);
 
-    const user = await this.prisma.user.create({
-      data: {
-        name: registerDto.name,
-        email: registerDto.email.toLowerCase(),
-        password: hashedPassword,
-        role: registerDto.role,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        isActive: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+    return this.prisma.$transaction(async tx => {
+      const user = await tx.user.create({
+        data: {
+          name: registerDto.name,
+          email: registerDto.email.toLowerCase(),
+          password: hashedPassword,
+          role: registerDto.role,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      // Send welcome email (non-blocking)
+      this.mailService
+        .sendWelcomeEmail(user.email, user.name)
+        .catch(err => this.logger.error('Failed to send welcome email', err));
+
+      const tokens = await this.generateTokens(user);
+      const hashedRefreshToken = await hashToken(tokens.refreshToken);
+
+      await tx.user.update({
+        where: { id: user.id },
+        data: { refreshToken: hashedRefreshToken },
+      });
+
+      return {
+        ...tokens,
+        user,
+      };
     });
-
-    // Send welcome email (non-blocking)
-    this.mailService
-      .sendWelcomeEmail(user.email, user.name)
-      .catch(err => this.logger.error('Failed to send welcome email', err));
-
-    const tokens = await this.generateTokens(user);
-    await this.updateRefreshToken(user.id, tokens.refreshToken);
-
-    return {
-      ...tokens,
-      user,
-    };
   }
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
     const user = await this.prisma.user.findUnique({
-      where: { email: loginDto.email.toLowerCase() },
+      where: { email: loginDto.email.toLowerCase(), deletedAt: null },
       select: {
         id: true,
         name: true,
@@ -89,14 +96,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    if (!user.isActive) {
-      throw new UnauthorizedException('Your account has been deactivated');
-    }
-
     const passwordValid = await comparePasswords(loginDto.password, user.password);
 
     if (!passwordValid) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException('Your account has been deactivated');
     }
 
     const tokens = await this.generateTokens(user);
@@ -112,7 +119,7 @@ export class AuthService {
 
   async refreshTokens(userId: string): Promise<TokensDto> {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: userId, deletedAt: null },
     });
 
     if (!user || !user.refreshToken) {
@@ -134,7 +141,7 @@ export class AuthService {
 
   async getMe(userId: string) {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: userId, deletedAt: null },
       select: {
         id: true,
         email: true,
