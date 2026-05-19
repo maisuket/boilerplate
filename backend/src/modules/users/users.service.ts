@@ -11,7 +11,7 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { PaginatedResult } from '../../shared/interfaces/pagination.interface';
-import { buildPaginatedResult } from '../../shared/utils/pagination.util';
+import { buildPaginatedResult, buildPaginationParams } from '../../shared/utils/pagination.util';
 import { hashPassword, comparePasswords } from '../../shared/utils/hash.util';
 import { Role, Prisma } from '@prisma/client';
 import { UsersRepository } from './users.repository';
@@ -21,10 +21,10 @@ export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    const existing = await this.usersRepository.findUnique({
-      where: { email: createUserDto.email.toLowerCase(), deletedAt: null },
-      select: { id: true }, // Optimization: Only need ID for existence check
-    });
+    const existing = await this.usersRepository.findFirst(
+      { email: createUserDto.email.toLowerCase(), deletedAt: null },
+      { id: true }, // Optimization: Only need ID for existence check
+    );
 
     if (existing) {
       throw new ConflictException('A user with this email already exists');
@@ -38,7 +38,7 @@ export class UsersService {
 
   async findAll(query: FindAllUsersDto): Promise<PaginatedResult<UserResponseDto>> {
     const [users, total] = await this.usersRepository.findManyAndCount(query);
-    const params = { page: query.page, limit: query.limit };
+    const params = buildPaginationParams(query);
 
     const userDtos = users.map(u => new UserResponseDto(u));
 
@@ -47,8 +47,9 @@ export class UsersService {
 
   async findOne(id: string): Promise<UserResponseDto> {
     const user = await this.usersRepository.findUnique({
-      where: { id, deletedAt: null },
-    });
+      id,
+      deletedAt: null,
+    } as Prisma.UserWhereUniqueInput);
 
     if (!user) {
       throw new NotFoundException(`User with ID '${id}' not found`);
@@ -59,8 +60,9 @@ export class UsersService {
 
   async findByEmail(email: string): Promise<UserResponseDto | null> {
     const user = await this.usersRepository.findUnique({
-      where: { email: email.toLowerCase(), deletedAt: null },
-    });
+      email: email.toLowerCase(),
+      deletedAt: null,
+    } as Prisma.UserWhereUniqueInput);
 
     if (!user) return null;
 
@@ -73,10 +75,10 @@ export class UsersService {
     requestingUserId: string,
     requestingUserRole: Role,
   ): Promise<UserResponseDto> {
-    const user = await this.usersRepository.findUnique({
-      where: { id, deletedAt: null },
-      select: { id: true },
-    });
+    const user = await this.usersRepository.findUnique(
+      { id, deletedAt: null } as Prisma.UserWhereUniqueInput,
+      { id: true },
+    );
 
     if (!user) {
       throw new NotFoundException(`User with ID '${id}' not found`);
@@ -95,14 +97,14 @@ export class UsersService {
     const updateData: Prisma.UserUpdateInput = { ...updateUserDto };
 
     if (updateUserDto.email) {
-      const existingEmail = await this.usersRepository.findFirst({
-        where: {
+      const existingEmail = await this.usersRepository.findFirst(
+        {
           email: updateUserDto.email.toLowerCase(),
           NOT: { id },
           deletedAt: null,
         },
-        select: { id: true },
-      });
+        { id: true },
+      );
 
       if (existingEmail) {
         throw new ConflictException('Email is already in use');
@@ -120,10 +122,10 @@ export class UsersService {
   }
 
   async remove(id: string, requestingUserId: string, requestingUserRole: Role): Promise<void> {
-    const user = await this.usersRepository.findUnique({
-      where: { id, deletedAt: null },
-      select: { id: true },
-    });
+    const user = await this.usersRepository.findUnique(
+      { id, deletedAt: null } as Prisma.UserWhereUniqueInput,
+      { id: true },
+    );
 
     if (!user) {
       throw new NotFoundException(`User with ID '${id}' not found`);
@@ -141,10 +143,10 @@ export class UsersService {
   }
 
   async toggleActive(id: string): Promise<UserResponseDto> {
-    const user = await this.usersRepository.findUnique({
-      where: { id, deletedAt: null },
-      select: { id: true, isActive: true },
-    });
+    const user = await this.usersRepository.findUnique(
+      { id, deletedAt: null } as Prisma.UserWhereUniqueInput,
+      { id: true, isActive: true },
+    );
 
     if (!user) {
       throw new NotFoundException(`User with ID '${id}' not found`);
@@ -156,13 +158,17 @@ export class UsersService {
   }
 
   async changePassword(id: string, dto: ChangePasswordDto): Promise<void> {
-    const user = await this.usersRepository.findUnique({
-      where: { id, deletedAt: null },
-      select: { id: true, password: true }, // Precisamos da senha aqui para validar
-    });
+    const user = await this.usersRepository.findUnique(
+      { id, deletedAt: null } as Prisma.UserWhereUniqueInput,
+      { id: true, password: true }, // Precisamos da senha aqui para validar
+    );
 
     if (!user) {
       throw new NotFoundException(`User with ID '${id}' not found`);
+    }
+
+    if (!user.password) {
+      throw new BadRequestException('User does not have a password set');
     }
 
     const isPasswordValid = await comparePasswords(dto.currentPassword, user.password);
