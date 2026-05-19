@@ -24,19 +24,21 @@ export interface AppConfig {
   };
 }
 
+// Joi validation in AppModule guarantees JWT_SECRET and JWT_REFRESH_SECRET
+// are present and ≥32 chars before this factory is ever called.
 export default (): AppConfig => ({
   nodeEnv: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.PORT || '3000', 10),
-  appUrl: process.env.APP_URL || 'http://localhost:3000',
+  port: parseInt(process.env.PORT || '3001', 10),
+  appUrl: process.env.APP_URL || 'http://localhost:3001',
   jwt: {
-    secret: process.env.JWT_SECRET || 'default-jwt-secret-change-in-production',
+    secret: process.env.JWT_SECRET || '',
     expiresIn: process.env.JWT_EXPIRES_IN || '15m',
-    refreshSecret: process.env.JWT_REFRESH_SECRET || 'default-refresh-secret-change-in-production',
+    refreshSecret: process.env.JWT_REFRESH_SECRET || '',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
   mail: {
-    host: process.env.MAIL_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.MAIL_PORT || '587', 10),
+    host: process.env.MAIL_HOST || 'localhost',
+    port: parseInt(process.env.MAIL_PORT || '1025', 10),
     user: process.env.MAIL_USER || '',
     pass: process.env.MAIL_PASS || '',
     from: process.env.MAIL_FROM || 'noreply@example.com',

@@ -21,6 +21,10 @@ async function bootstrap() {
   const nodeEnv = configService.get<string>('nodeEnv');
   const appUrl = configService.get<string>('appUrl');
 
+  // Trust the first proxy hop so request.ip resolves to the real client IP
+  // (required for correct rate-limiting and audit logging behind nginx/load balancer)
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
+
   // Global prefix
   app.setGlobalPrefix('api');
 

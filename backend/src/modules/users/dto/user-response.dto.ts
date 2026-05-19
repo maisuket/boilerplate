@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
 
@@ -25,6 +25,14 @@ export class UserResponseDto {
   isActive: boolean;
 
   @Expose()
+  @ApiProperty({ example: false })
+  emailVerified: boolean;
+
+  @Expose()
+  @ApiPropertyOptional({ example: null })
+  lastLoginAt: Date | null;
+
+  @Expose()
   @ApiProperty()
   createdAt: Date;
 
@@ -37,6 +45,18 @@ export class UserResponseDto {
 
   @Exclude()
   refreshToken: string | null;
+
+  @Exclude()
+  loginAttempts: number;
+
+  @Exclude()
+  lockedUntil: Date | null;
+
+  @Exclude()
+  passwordChangedAt: Date | null;
+
+  @Exclude()
+  deletedAt: Date | null;
 
   constructor(partial: Partial<UserResponseDto>) {
     Object.assign(this, partial);

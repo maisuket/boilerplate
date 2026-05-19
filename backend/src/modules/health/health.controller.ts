@@ -1,31 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, HttpCode, HttpStatus, Res, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Response } from 'express';
+import { SkipThrottle } from '@nestjs/throttler';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Public } from '../../shared/decorators/public.decorator';
-
-interface HealthStatus {
-  status: 'ok' | 'error';
-  timestamp: string;
-  uptime: number;
-  version: string;
-  environment: string;
-  checks: {
-    database: {
-      status: 'ok' | 'error';
-      responseTime?: number;
-      error?: string;
-    };
-    memory: {
-      status: 'ok' | 'warn' | 'error';
-      heapUsed: number;
-      heapTotal: number;
-      rss: number;
-      usagePercent: number;
-    };
-  };
-}
+import { JwtAuthGuard } from '../../shared/guards/jwt-auth.guard';
+import { RolesGuard } from '../../shared/guards/roles.guard';
+import { Roles } from '../../shared/decorators/roles.decorator';
+import { CurrentUser } from '../../shared/decorators/current-user.decorator';
+import { Role } from '@prisma/client';
 
 @ApiTags('Health')
+@SkipThrottle()
 @Controller('health')
 export class HealthController {
   constructor(private readonly prisma: PrismaService) {}
@@ -35,16 +21,40 @@ export class HealthController {
   @ApiOperation({ summary: 'Application health check' })
   @ApiResponse({ status: 200, description: 'Application is healthy' })
   @ApiResponse({ status: 503, description: 'Application is unhealthy' })
-  async check(): Promise<HealthStatus> {
-    const startTime = Date.now();
-    let dbStatus: HealthStatus['checks']['database'];
+  async check(@Res() res: Response): Promise<void> {
+    let dbOk = false;
 
     try {
       await this.prisma.$queryRaw`SELECT 1`;
-      dbStatus = {
-        status: 'ok',
-        responseTime: Date.now() - startTime,
-      };
+      dbOk = true;
+    } catch {
+      // intentional
+    }
+
+    const overallStatus = dbOk ? 'ok' : 'error';
+    const statusCode = overallStatus === 'ok' ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE;
+
+    res.status(statusCode).json({
+      status: overallStatus,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('details')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Detailed health check (Admin only)' })
+  @ApiResponse({ status: 200, description: 'Detailed health information' })
+  @ApiResponse({ status: 503, description: 'Application is unhealthy' })
+  async details(@Res() res: Response): Promise<void> {
+    const startTime = Date.now();
+    let dbStatus: { status: 'ok' | 'error'; responseTime?: number; error?: string };
+
+    try {
+      await this.prisma.$queryRaw`SELECT 1`;
+      dbStatus = { status: 'ok', responseTime: Date.now() - startTime };
     } catch (error) {
       dbStatus = {
         status: 'error',
@@ -58,13 +68,13 @@ export class HealthController {
     const rssMB = Math.round(memUsage.rss / 1024 / 1024);
     const usagePercent = Math.round((memUsage.heapUsed / memUsage.heapTotal) * 100);
 
-    const memStatus: HealthStatus['checks']['memory']['status'] =
+    const memStatus: 'ok' | 'warn' | 'error' =
       usagePercent > 90 ? 'error' : usagePercent > 75 ? 'warn' : 'ok';
 
-    const overallStatus =
-      dbStatus.status === 'error' || memStatus === 'error' ? 'error' : 'ok';
+    const overallStatus = dbStatus.status === 'error' || memStatus === 'error' ? 'error' : 'ok';
+    const statusCode = overallStatus === 'ok' ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE;
 
-    return {
+    res.status(statusCode).json({
       status: overallStatus,
       timestamp: new Date().toISOString(),
       uptime: Math.floor(process.uptime()),
@@ -80,7 +90,7 @@ export class HealthController {
           usagePercent,
         },
       },
-    };
+    });
   }
 
   @Public()

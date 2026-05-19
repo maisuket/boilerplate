@@ -23,7 +23,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const existing = await this.usersRepository.findFirst(
       { email: createUserDto.email.toLowerCase(), deletedAt: null },
-      { id: true }, // Optimization: Only need ID for existence check
+      { id: true },
     );
 
     if (existing) {
@@ -39,13 +39,19 @@ export class UsersService {
   async findAll(query: FindAllUsersDto): Promise<PaginatedResult<UserResponseDto>> {
     const [users, total] = await this.usersRepository.findManyAndCount(query);
     const params = buildPaginationParams(query);
-
-    const userDtos = users.map(u => new UserResponseDto(u));
-
-    return buildPaginatedResult(userDtos, total, params);
+    return buildPaginatedResult(users.map(u => new UserResponseDto(u)), total, params);
   }
 
-  async findOne(id: string): Promise<UserResponseDto> {
+  async findOne(
+    id: string,
+    requestingUserId: string,
+    requestingUserRole: Role,
+  ): Promise<UserResponseDto> {
+    // Authorization belongs in the service, not the controller
+    if (requestingUserRole !== Role.ADMIN && requestingUserId !== id) {
+      throw new ForbiddenException('You can only view your own profile');
+    }
+
     const user = await this.usersRepository.findUnique({
       id,
       deletedAt: null,
@@ -64,9 +70,7 @@ export class UsersService {
       deletedAt: null,
     } as Prisma.UserWhereUniqueInput);
 
-    if (!user) return null;
-
-    return new UserResponseDto(user);
+    return user ? new UserResponseDto(user) : null;
   }
 
   async update(
@@ -84,40 +88,44 @@ export class UsersService {
       throw new NotFoundException(`User with ID '${id}' not found`);
     }
 
-    // Only admins can update other users or change roles
     if (requestingUserId !== id && requestingUserRole !== Role.ADMIN) {
       throw new ForbiddenException('You can only update your own profile');
     }
 
-    // Only admins can change roles
     if (updateUserDto.role && requestingUserRole !== Role.ADMIN) {
       throw new ForbiddenException('Only admins can change user roles');
     }
 
-    const updateData: Prisma.UserUpdateInput = { ...updateUserDto };
+    // Explicit field mapping — prevents mass assignment via DTO spread
+    const updateData: Prisma.UserUpdateInput = {};
 
-    if (updateUserDto.email) {
+    if (updateUserDto.name !== undefined) {
+      updateData.name = updateUserDto.name;
+    }
+
+    if (updateUserDto.email !== undefined) {
       const existingEmail = await this.usersRepository.findFirst(
-        {
-          email: updateUserDto.email.toLowerCase(),
-          NOT: { id },
-          deletedAt: null,
-        },
+        { email: updateUserDto.email.toLowerCase(), NOT: { id }, deletedAt: null },
         { id: true },
       );
-
-      if (existingEmail) {
-        throw new ConflictException('Email is already in use');
-      }
+      if (existingEmail) throw new ConflictException('Email is already in use');
       updateData.email = updateUserDto.email.toLowerCase();
     }
 
-    if (updateUserDto.password) {
+    if (updateUserDto.role !== undefined) {
+      updateData.role = updateUserDto.role;
+    }
+
+    if (updateUserDto.isActive !== undefined) {
+      updateData.isActive = updateUserDto.isActive;
+    }
+
+    if (updateUserDto.password !== undefined) {
       updateData.password = await hashPassword(updateUserDto.password);
+      updateData.passwordChangedAt = new Date();
     }
 
     const updated = await this.usersRepository.update(id, updateData);
-
     return new UserResponseDto(updated);
   }
 
@@ -153,14 +161,13 @@ export class UsersService {
     }
 
     const updated = await this.usersRepository.update(id, { isActive: !user.isActive });
-
     return new UserResponseDto(updated);
   }
 
   async changePassword(id: string, dto: ChangePasswordDto): Promise<void> {
     const user = await this.usersRepository.findUnique(
       { id, deletedAt: null } as Prisma.UserWhereUniqueInput,
-      { id: true, password: true }, // Precisamos da senha aqui para validar
+      { id: true, password: true },
     );
 
     if (!user) {
@@ -177,8 +184,9 @@ export class UsersService {
       throw new BadRequestException('Current password is incorrect');
     }
 
-    const hashedPassword = await hashPassword(dto.newPassword);
-
-    await this.usersRepository.update(id, { password: hashedPassword });
+    await this.usersRepository.update(id, {
+      password: await hashPassword(dto.newPassword),
+      passwordChangedAt: new Date(),
+    });
   }
 }

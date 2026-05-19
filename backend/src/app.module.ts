@@ -5,6 +5,7 @@ import { APP_GUARD, APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
 import { ScheduleModule } from '@nestjs/schedule';
 import * as winston from 'winston';
+import * as Joi from 'joi';
 import configuration from './config/configuration';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -15,15 +16,33 @@ import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
 import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
+import { AuditInterceptor } from './shared/interceptors/audit.interceptor';
 import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
 
 @Module({
   imports: [
-    // Configuration
+    // Configuration — validates required env vars before anything else boots
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
       envFilePath: ['.env.local', '.env'],
+      validationSchema: Joi.object({
+        NODE_ENV: Joi.string()
+          .valid('development', 'test', 'production')
+          .default('development'),
+        PORT: Joi.number().default(3001),
+        DATABASE_URL: Joi.string().required(),
+        JWT_SECRET: Joi.string().min(32).required(),
+        JWT_REFRESH_SECRET: Joi.string().min(32).required(),
+        JWT_EXPIRES_IN: Joi.string().default('15m'),
+        JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
+        MAIL_HOST: Joi.string().default('localhost'),
+        MAIL_PORT: Joi.number().default(1025),
+        MAIL_FROM: Joi.string().default('noreply@example.com'),
+        THROTTLE_TTL: Joi.number().default(60000),
+        THROTTLE_LIMIT: Joi.number().default(100),
+      }),
+      validationOptions: { abortEarly: false, allowUnknown: true },
     }),
 
     // Rate limiting
@@ -81,10 +100,8 @@ import { GlobalExceptionFilter } from './shared/filters/global-exception.filter'
       inject: [ConfigService],
     }),
 
-    // Scheduled tasks
     ScheduleModule.forRoot(),
 
-    // Core modules
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -92,36 +109,14 @@ import { GlobalExceptionFilter } from './shared/filters/global-exception.filter'
     MailModule,
   ],
   providers: [
-    // Global rate limiting
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
-    // Global JWT auth guard
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-    // Global roles guard
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-    // Global transform interceptor
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: TransformInterceptor,
-    },
-    // Global logging interceptor
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: LoggingInterceptor,
-    },
-    // Global exception filter
-    {
-      provide: APP_FILTER,
-      useClass: GlobalExceptionFilter,
-    },
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
+    // Persist audit trail for all mutating requests (POST/PUT/PATCH/DELETE)
+    { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
+    { provide: APP_FILTER, useClass: GlobalExceptionFilter },
   ],
 })
 export class AppModule {}

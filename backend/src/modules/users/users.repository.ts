@@ -11,6 +11,8 @@ export const safeUserSelect: Prisma.UserSelect = {
   email: true,
   role: true,
   isActive: true,
+  emailVerified: true,
+  lastLoginAt: true,
   deletedAt: true,
   createdAt: true,
   updatedAt: true,

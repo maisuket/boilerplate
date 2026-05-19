@@ -16,16 +16,16 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     super({
       jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
       ignoreExpiration: false,
-      secretOrKey: configService.getOrThrow<string>('jwt.secret'),
+      secretOrKey: configService.getOrThrow<string>('jwt.refreshSecret'),
       passReqToCallback: true,
     });
   }
 
   async validate(req: Request, payload: JwtRefreshPayload) {
-    const refreshToken = req.body?.refreshToken;
+    const rawRefreshToken = req.body?.refreshToken as string | undefined;
 
-    if (!refreshToken) {
-      throw new UnauthorizedException('Refresh token not provided');
+    if (!rawRefreshToken) {
+      throw new UnauthorizedException('Access denied');
     }
 
     const user = await this.prisma.user.findUnique({
@@ -33,21 +33,22 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     });
 
     if (!user || !user.refreshToken) {
-      throw new UnauthorizedException('Access denied: invalid refresh token');
+      throw new UnauthorizedException('Access denied');
     }
 
     if (!user.isActive) {
-      throw new UnauthorizedException('User account is deactivated');
+      throw new UnauthorizedException('Access denied');
     }
 
-    const refreshTokenMatches = await compareTokens(refreshToken, user.refreshToken);
+    const refreshSecret = this.configService.get<string>('jwt.refreshSecret')!;
+    const tokenMatches = compareTokens(rawRefreshToken, user.refreshToken, refreshSecret);
 
-    if (!refreshTokenMatches) {
-      throw new UnauthorizedException('Access denied: refresh token mismatch');
+    if (!tokenMatches) {
+      throw new UnauthorizedException('Access denied');
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken: _rt, ...result } = user;
-    return { ...result, refreshToken };
+    return { ...result, refreshToken: rawRefreshToken };
   }
 }
