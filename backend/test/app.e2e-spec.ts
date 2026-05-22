@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
+import { createHash } from 'crypto';
+import { TokenType } from '@prisma/client';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { TransformInterceptor } from '../src/shared/interceptors/transform.interceptor';
@@ -51,8 +53,10 @@ describe('AppController (e2e)', () => {
   afterAll(async () => {
     // Clean up test data
     if (createdUserId) {
+      await prisma.token.deleteMany({ where: { userId: createdUserId } }).catch(() => {});
       await prisma.user.deleteMany({ where: { id: createdUserId } }).catch(() => {});
     }
+    await prisma.token.deleteMany({ where: { user: { email: testUser.email } } }).catch(() => {});
     await prisma.user.deleteMany({ where: { email: testUser.email } }).catch(() => {});
     await app.close();
   });
@@ -197,6 +201,164 @@ describe('AppController (e2e)', () => {
           .post('/api/auth/logout')
           .set('Authorization', `Bearer ${userToken}`)
           .expect(200);
+      });
+    });
+
+    describe('POST /api/auth/forgot-password', () => {
+      it('should return 200 even for non-existent email (no enumeration)', () => {
+        return request(app.getHttpServer())
+          .post('/api/auth/forgot-password')
+          .send({ email: 'nobody@nowhere.com' })
+          .expect(200);
+      });
+
+      it('should return 200 and create a reset token for existing user', async () => {
+        await request(app.getHttpServer())
+          .post('/api/auth/forgot-password')
+          .send({ email: adminCredentials.email })
+          .expect(200);
+
+        const adminUser = await prisma.user.findUnique({
+          where: { email: adminCredentials.email },
+        });
+        const token = await prisma.token.findFirst({
+          where: { userId: adminUser!.id, type: TokenType.PASSWORD_RESET, usedAt: null },
+        });
+        expect(token).not.toBeNull();
+      });
+
+      it('should return 400 for invalid email format', () => {
+        return request(app.getHttpServer())
+          .post('/api/auth/forgot-password')
+          .send({ email: 'not-an-email' })
+          .expect(400);
+      });
+    });
+
+    describe('POST /api/auth/reset-password', () => {
+      it('should reset password with a valid token', async () => {
+        // Seed a reset token directly (bypassing email)
+        const rawToken = 'e2e-reset-token-abcdef1234567890abcdef1234567890';
+        const hashedToken = createHash('sha256').update(rawToken).digest('hex');
+        const e2eUser = await prisma.user.findUnique({ where: { email: testUser.email } });
+
+        if (e2eUser) {
+          await prisma.token.create({
+            data: {
+              userId: e2eUser.id,
+              token: hashedToken,
+              type: TokenType.PASSWORD_RESET,
+              expiresAt: new Date(Date.now() + 3600000),
+            },
+          });
+
+          await request(app.getHttpServer())
+            .post('/api/auth/reset-password')
+            .send({ token: rawToken, password: 'NewPass@456' })
+            .expect(200);
+
+          // Old password should no longer work
+          await request(app.getHttpServer())
+            .post('/api/auth/login')
+            .send({ email: testUser.email, password: testUser.password })
+            .expect(401);
+        }
+      });
+
+      it('should return 400 for an invalid token', () => {
+        return request(app.getHttpServer())
+          .post('/api/auth/reset-password')
+          .send({ token: 'completely-invalid-token', password: 'NewPass@456' })
+          .expect(400);
+      });
+
+      it('should return 400 for weak new password', () => {
+        return request(app.getHttpServer())
+          .post('/api/auth/reset-password')
+          .send({ token: 'any-token', password: '123' })
+          .expect(400);
+      });
+    });
+
+    describe('POST /api/auth/verify-email', () => {
+      it('should verify email with a valid token', async () => {
+        const rawToken = 'e2e-verify-token-abcdef1234567890abcdef1234567890';
+        const hashedToken = createHash('sha256').update(rawToken).digest('hex');
+        const adminUser = await prisma.user.findUnique({ where: { email: adminCredentials.email } });
+
+        if (adminUser) {
+          await prisma.token.create({
+            data: {
+              userId: adminUser.id,
+              token: hashedToken,
+              type: TokenType.EMAIL_VERIFICATION,
+              expiresAt: new Date(Date.now() + 86400000),
+            },
+          });
+
+          await prisma.user.update({
+            where: { id: adminUser.id },
+            data: { emailVerified: false },
+          });
+
+          await request(app.getHttpServer())
+            .post('/api/auth/verify-email')
+            .send({ token: rawToken })
+            .expect(200);
+
+          const updated = await prisma.user.findUnique({ where: { id: adminUser.id } });
+          expect(updated?.emailVerified).toBe(true);
+
+          // Restore
+          await prisma.user.update({
+            where: { id: adminUser.id },
+            data: { emailVerified: true },
+          });
+        }
+      });
+
+      it('should return 400 for an invalid token', () => {
+        return request(app.getHttpServer())
+          .post('/api/auth/verify-email')
+          .send({ token: 'invalid-token' })
+          .expect(400);
+      });
+    });
+
+    describe('POST /api/auth/resend-verification', () => {
+      it('should return 200 even for non-existent email (no enumeration)', () => {
+        return request(app.getHttpServer())
+          .post('/api/auth/resend-verification')
+          .send({ email: 'nobody@nowhere.com' })
+          .expect(200);
+      });
+
+      it('should return 200 for existing unverified user and create new token', async () => {
+        const adminUser = await prisma.user.findUnique({ where: { email: adminCredentials.email } });
+
+        if (adminUser) {
+          // Temporarily mark as unverified
+          await prisma.user.update({
+            where: { id: adminUser.id },
+            data: { emailVerified: false },
+          });
+
+          await request(app.getHttpServer())
+            .post('/api/auth/resend-verification')
+            .send({ email: adminCredentials.email })
+            .expect(200);
+
+          const token = await prisma.token.findFirst({
+            where: { userId: adminUser.id, type: TokenType.EMAIL_VERIFICATION, usedAt: null },
+          });
+          expect(token).not.toBeNull();
+
+          // Restore
+          await prisma.user.update({
+            where: { id: adminUser.id },
+            data: { emailVerified: true },
+          });
+        }
       });
     });
   });

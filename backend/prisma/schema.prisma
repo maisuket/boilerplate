@@ -15,6 +15,11 @@ enum Role {
   USER
 }
 
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
 model User {
   id                String     @id @default(uuid())
   email             String     @unique
@@ -33,11 +38,28 @@ model User {
   deletedAt         DateTime?
   updatedAt         DateTime   @updatedAt
   auditLogs         AuditLog[]
+  tokens            Token[]
 
   @@index([role])
   @@index([isActive])
   @@index([deletedAt])
   @@map("users")
+}
+
+model Token {
+  id        String    @id @default(uuid())
+  userId    String
+  token     String    @unique
+  type      TokenType
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([type, userId])
+  @@map("tokens")
 }
 
 model AuditLog {

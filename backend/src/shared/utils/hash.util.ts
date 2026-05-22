@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { createHmac, timingSafeEqual } from 'crypto';
+import { createHmac, createHash, randomBytes, timingSafeEqual } from 'crypto';
 
 const SALT_ROUNDS = 12;
 
@@ -26,4 +26,14 @@ export function compareTokens(plaintext: string, hashed: string, secret: string)
   const computedBuf = Buffer.from(computed, 'hex');
   if (hashedBuf.length !== computedBuf.length) return false;
   return timingSafeEqual(hashedBuf, computedBuf);
+}
+
+/** Generates a 32-byte cryptographically secure random token (64 hex chars). */
+export function generateSecureToken(): string {
+  return randomBytes(32).toString('hex');
+}
+
+/** SHA-256 hash for high-entropy verification/reset tokens (no secret needed). */
+export function hashVerificationToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex');
 }

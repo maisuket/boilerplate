@@ -65,6 +65,32 @@ export class MailService {
     }
   }
 
+  async sendVerificationEmail(email: string, name: string, verifyToken: string): Promise<void> {
+    const appUrl = this.configService.get<string>('appUrl');
+    const verifyUrl = `${appUrl}/verify-email?token=${verifyToken}`;
+
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Please verify your email address',
+        template: 'verify-email',
+        context: {
+          name,
+          email,
+          verifyUrl,
+          expiresIn: '24 hours',
+          appUrl,
+          year: new Date().getFullYear(),
+        },
+      });
+
+      this.logger.log(`Verification email sent to ${email}`);
+    } catch (error) {
+      this.logger.error(`Failed to send verification email to ${email}`, error);
+      throw error;
+    }
+  }
+
   async sendGenericEmail(
     to: string,
     subject: string,
