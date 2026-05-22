@@ -35,7 +35,7 @@ ENV NODE_ENV=production
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nestjs -u 1001
 
-COPY --from=deps --chown=nestjs:nodejs /app/node_modules ./node_modules
+COPY --from=development --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
 
